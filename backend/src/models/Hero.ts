@@ -13,9 +13,17 @@ export class Hero extends Avatar {
     classType: string,
     level: number,
     stats: Stat,
-    public storage: StorageType
+    public storage: StorageType | null = null
   ) {
     super(name, race, classType, level, stats);
+  }
+
+  isDead(): boolean {
+    return this.health <= 0;
+  }
+
+  isAlive(): boolean {
+    return !this.isDead();
   }
 
   gainExperience(amount: number): void {
@@ -26,25 +34,31 @@ export class Hero extends Avatar {
   }
 
   storeItem(item: Item): boolean {
+    if (!this.storage) {
+      return false; // Storage.NO_STORAGE;
+    }
     if (this.storage.items.length >= this.storage.capacity) {
-      return false; // StoreItem.FULL;
+      return false; // Storage.FULL;
     }
     this.storage.items.push(item);
-    return true; // StoreItem.STORED;
+    return true; // Storage.ITEM_STORED;
   }
 
   sellItem(item: Item): boolean {
+    if (!this.storage) {
+      return false; // Storage.NO_STORAGE;
+    }
     const index = this.storage.items.indexOf(item);
     if (index === -1) {
-      return false; // SellItem.NOT_FOUND;
+      return false; // Storage.ITEM_NOT_FOUND;
     }
     if (item.durability <= 0) {
-      return false; // SellItem.BROKEN;
+      return false; // Storage.ITEM_BROKEN;
     }
     this.storage.items.splice(index, 1);
     const amountDue = item.price - item.price * (item.durability / 100);
     this.money += amountDue;
-    return true; // SellItem.SOLD;
+    return true; // Storage.ITEM_SOLD;
   }
 
   private levelUp(): void {

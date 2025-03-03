@@ -14,11 +14,11 @@ export class Stat {
   }
 
   get baseHealth(): number {
-    return this.endurance * 1.5;
+    return this.endurance + this.luck;
   }
 
   get attack(): number {
-    return this.strength + this.agility + this.magic;
+    return Math.round((this.strength + this.agility + this.magic) / 2);
   }
 
   get defense(): number {
