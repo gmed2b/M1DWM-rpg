@@ -39,10 +39,17 @@ export class BattleService {
       for (let i = 0; i < 2; i++) {
         log.push(`${this.attacker.name}'s turn`);
 
-        const damageDealt = this.attacker.attack;
-        this.defender.defend(damageDealt);
+        const attack = this.attacker.attack;
+        const defense = this.defender.defend(attack.damages);
 
-        log.push(`${this.attacker.name} deals ${damageDealt} damage`);
+        if (defense.partialDodge) {
+          log.push(`${this.defender.name} partially dodges the attack`);
+        }
+        log.push(
+          `${this.attacker.name} deals ${defense.damagesTaken} damage${
+            attack.isCriticalHit ? " (Critical Hit)" : ""
+          }`
+        );
 
         if (this.defender.isDead()) {
           log.push(`${this.defender.name} has died`);

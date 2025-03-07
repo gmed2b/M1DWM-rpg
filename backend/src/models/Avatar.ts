@@ -17,17 +17,30 @@ export class Avatar {
     return this.stats.speed + Math.random() * 10;
   }
 
-  get attack(): number {
+  get attack(): {
+    damages: number;
+    isCriticalHit: boolean;
+  } {
     const isCriticalHit = Math.random() < this.stats.luck / 100;
     const damages = this.stats.attack;
-    return isCriticalHit ? damages * 2 : damages;
+    return {
+      damages: isCriticalHit ? damages * 2 : damages,
+      isCriticalHit,
+    };
   }
 
-  defend(damages: number): void {
+  defend(damages: number): {
+    partialDodge: boolean;
+    damagesTaken: number;
+  } {
     const dodgeChance =
       this.stats.agility + this.stats.speed + this.stats.endurance;
-    const isDodging = Math.random() < dodgeChance / 100;
-    if (isDodging) return;
-    this.health = Math.max(0, this.health - damages);
+    const partialDodge = Math.random() < dodgeChance / 100;
+    const damagesTaken = partialDodge ? Math.round(damages / 2) : damages;
+    this.health = Math.max(0, this.health - damagesTaken);
+    return {
+      partialDodge,
+      damagesTaken,
+    };
   }
 }
