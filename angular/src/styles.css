@@ -11,7 +11,8 @@ body {
   font-family: "Press Start 2P", system-ui, sans-serif;
 }
 
-.rpgui-container {
+.rpgui-container,
+.rpgui-content {
   position: initial;
 }
 
