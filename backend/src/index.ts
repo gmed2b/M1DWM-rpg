@@ -1,15 +1,13 @@
-import { Hono } from "hono";
-import { logger } from "hono/logger";
-import userRoutes from "./routes/userRoutes";
+import { serve } from "@hono/node-server";
 
-const app = new Hono();
+import app from "./app";
+import env from "./env";
 
-app.use(logger());
+const port = env.PORT;
+// eslint-disable-next-line no-console
+console.log(`Server is running on port http://localhost:${port}`);
 
-app.get("/", (c) =>
-  c.json({ status: "Server is running", time: new Date().toISOString() })
-);
-
-app.route("/api/users", userRoutes);
-
-export default app;
+serve({
+  fetch: app.fetch,
+  port,
+});
