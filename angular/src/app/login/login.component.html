@@ -1,0 +1,72 @@
+<main class="rpgui-container framed flex justify-center items-center py-20!">
+  <div class="rpgui-container framed-golden max-w-md w-full p-6">
+    <h1 class="!text-2xl text-center">RPG Adventure</h1>
+    <hr class="golden mb-8" />
+
+    <!-- Logo du jeu 
+    <div class="flex justify-center mb-6">
+      <div
+        class="rpgui-icon shield-slot"
+        style="width: 80px; height: 80px"
+      ></div>
+    </div>
+    -->
+
+    <!-- Formulaire de connexion -->
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      <div class="mb-6">
+        <label class="block mb-2">Nom d'aventurier</label>
+        <input
+          type="text"
+          formControlName="username"
+          class="rpgui-input mb-1 w-full"
+          placeholder="Entrez votre nom d'aventurier"
+        />
+        <div
+          *ngIf="username.invalid && (username.dirty || username.touched)"
+          class="text-red-400 text-sm"
+        >
+          <div *ngIf="username.errors?.['required']">
+            Nom d'aventurier requis
+          </div>
+        </div>
+      </div>
+
+      <div class="mb-6">
+        <label class="block mb-2">Mot de passe</label>
+        <input
+          type="password"
+          formControlName="password"
+          class="rpgui-input mb-1 w-full"
+          placeholder="Entrez votre mot de passe"
+        />
+        <div
+          *ngIf="password.invalid && (password.dirty || password.touched)"
+          class="text-red-400 text-sm"
+        >
+          <div *ngIf="password.errors?.['required']">Mot de passe requis</div>
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-3">
+        <button
+          type="submit"
+          class="rpgui-button"
+          [disabled]="loginForm.invalid"
+        >
+          <p>COMMENCER L'AVENTURE</p>
+        </button>
+      </div>
+    </form>
+
+    <hr class="golden my-6" />
+
+    <!-- Pas encore de compte -->
+    <div class="text-center">
+      <p class="mb-4">Pas encore de compte?</p>
+      <a href="/register" class="rpgui-button golden">
+        <p>CRÉER UN COMPTE</p>
+      </a>
+    </div>
+  </div>
+</main>

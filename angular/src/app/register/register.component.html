@@ -1,0 +1,175 @@
+<main class="rpgui-container framed flex justify-center items-center py-20!">
+  <div class="rpgui-container framed-golden max-w-md w-full p-6">
+    <h1 class="!text-2xl text-center">Création d'Aventurier</h1>
+    <hr class="golden mb-8" />
+
+    <!-- Formulaire d'inscription -->
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+      <!-- Informations de base -->
+      <div class="mb-6">
+        <label class="block mb-2">Nom d'aventurier</label>
+        <input
+          type="text"
+          formControlName="username"
+          class="rpgui-input mb-1 w-full"
+          placeholder="Choisissez un nom d'aventurier"
+        />
+        <div
+          *ngIf="username.invalid && (username.dirty || username.touched)"
+          class="text-red-400 text-sm"
+        >
+          <div *ngIf="username.errors?.['required']">
+            Nom d'aventurier requis
+          </div>
+          <div *ngIf="username.errors?.['minlength']">
+            Le nom doit contenir au moins 3 caractères
+          </div>
+        </div>
+      </div>
+
+      <div class="mb-6">
+        <label class="block mb-2">Mot de passe</label>
+        <input
+          type="password"
+          formControlName="password"
+          class="rpgui-input mb-1 w-full"
+          placeholder="Créez votre mot de passe"
+        />
+        <div
+          *ngIf="password.invalid && (password.dirty || password.touched)"
+          class="text-red-400 text-sm"
+        >
+          <div *ngIf="password.errors?.['required']">Mot de passe requis</div>
+          <div *ngIf="password.errors?.['minlength']">
+            Le mot de passe doit contenir au moins 6 caractères
+          </div>
+        </div>
+      </div>
+
+      <div class="mb-6">
+        <label class="block mb-2">Confirmation du mot de passe</label>
+        <input
+          type="password"
+          formControlName="confirmPassword"
+          class="rpgui-input mb-1 w-full"
+          placeholder="Confirmez votre mot de passe"
+        />
+        <div
+          *ngIf="
+            confirmPassword.invalid &&
+            (confirmPassword.dirty || confirmPassword.touched)
+          "
+          class="text-red-400 text-sm"
+        >
+          <div *ngIf="confirmPassword.errors?.['required']">
+            Confirmation requise
+          </div>
+        </div>
+        <div
+          *ngIf="registerForm.errors?.['passwordMismatch'] && confirmPassword.touched"
+          class="text-red-400 text-sm"
+        >
+          Les mots de passe ne correspondent pas
+        </div>
+      </div>
+
+      <!-- Choix de classe -->
+      <div class="mb-6">
+        <label class="block mb-2">Choisissez votre classe</label>
+        <select
+          class="rpgui-list"
+          id="background-select"
+          size="5"
+          data-rpguitype="list"
+          style="display: none"
+        >
+          <option value="Blacksmith">Blacksmith</option>
+          <option value="Merchant">Merchant</option>
+          <option value="City Guard">City Guard</option>
+          <option value="Alchemist">Alchemist</option>
+          <option value="Explorer">Explorer</option>
+          <option value="Thug">Thug</option>
+          <option value="Mercenary">Mercenary</option>
+          <option value="Royalty">Royalty</option>
+          <option value="Gladiator">Gladiator</option>
+        </select>
+        <ul
+          id="background-select-rpgui-list"
+          class="rpgui-list-imp"
+          style="height: 140px"
+        >
+          <li data-rpguivalue="Blacksmith" class=" ">Blacksmith</li>
+          <li data-rpguivalue="Merchant" class=" ">Merchant</li>
+          <li data-rpguivalue="City Guard" class="">City Guard</li>
+          <li data-rpguivalue="Alchemist" class=" ">Alchemist</li>
+          <li data-rpguivalue="Explorer" class="rpgui-selected">Explorer</li>
+          <li data-rpguivalue="Thug" class="">Thug</li>
+          <li data-rpguivalue="Mercenary" class="">Mercenary</li>
+          <li data-rpguivalue="Royalty" class="">Royalty</li>
+          <li data-rpguivalue="Gladiator" class="">Gladiator</li>
+        </ul>
+        <div
+          *ngIf="
+            characterClass.invalid &&
+            (characterClass.dirty || characterClass.touched)
+          "
+          class="text-red-400 text-sm"
+        >
+          <div *ngIf="characterClass.errors?.['required']">
+            Choisissez une classe
+          </div>
+        </div>
+      </div>
+
+      <!-- Conditions d'utilisation -->
+      <div class="flex items-center mb-6">
+        <input
+          type="checkbox"
+          formControlName="termsAccepted"
+          class="rpgui-checkbox"
+          id="termsAccepted"
+        />
+        <label for="termsAccepted" class="ml-2">
+          J'accepte les
+          <span class="rpgui-cursor-point text-yellow-400"
+            >conditions d'utilisation</span
+          >
+        </label>
+        <div
+          *ngIf="
+            termsAccepted.invalid &&
+            (termsAccepted.dirty || termsAccepted.touched)
+          "
+          class="text-red-400 text-sm ml-2"
+        >
+          <div *ngIf="termsAccepted.errors?.['required']">
+            Vous devez accepter les conditions
+          </div>
+        </div>
+      </div>
+
+      <!-- Boutons d'action -->
+      <div class="flex flex-col gap-3">
+        <button
+          type="submit"
+          class="rpgui-button golden"
+          [disabled]="registerForm.invalid"
+        >
+          <p>CRÉER MON AVENTURIER</p>
+        </button>
+
+        <button type="button" class="rpgui-button" (click)="onCancel()">
+          <p>RETOUR</p>
+        </button>
+      </div>
+    </form>
+
+    <!-- Information complémentaire -->
+    <div class="text-center mt-6">
+      <p class="text-sm">
+        En créant un compte, vous pourrez sauvegarder votre progression,
+        rejoindre des guildes et participer aux événements saisonniers.
+      </p>
+    </div>
+  </div>
+</main>
