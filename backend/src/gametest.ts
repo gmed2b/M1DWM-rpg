@@ -3,6 +3,7 @@ import { Item } from "./models/Item";
 import { Mob } from "./models/Mob";
 import { Stat } from "./models/Stat";
 import { StorageType } from "./models/StorageType";
+import { BattleService } from "./services/BattleService";
 
 // GameTest.ts
 console.log("Starting RPG Game Test Scenario");
@@ -26,7 +27,7 @@ const hero = new Hero(
 );
 
 // 4. Create a monster
-const monster = new Mob("Goblin Chief", 4, mobStats);
+const opponent = new Mob("Goblin Chief", 4, mobStats);
 
 // 5. Create some items
 const sword = new Item("Steel Sword", "Weapon", 85, 100);
@@ -47,10 +48,10 @@ console.log(`Storage: ${hero.storage?.description}`);
 console.log("\n");
 
 console.log("MONSTER:");
-console.log(`Name: ${monster.name}`);
-console.log(`Health: ${monster.health}`);
-console.log(`Attack: ${monster.stats.attack}`);
-console.log(`Defense: ${monster.stats.defense}`);
+console.log(`Name: ${opponent.name}`);
+console.log(`Health: ${opponent.health}`);
+console.log(`Attack: ${opponent.stats.attack}`);
+console.log(`Defense: ${opponent.stats.defense}`);
 console.log("\n");
 
 // Store items in backpack
@@ -80,137 +81,32 @@ if (hero.storage) {
 }
 console.log("\n");
 
-// Combat simulation
-console.log("COMBAT SIMULATION:");
-console.log(`${hero.name} encounters ${monster.name}!`);
-let round = 1;
+// Track initial hero stats
+const initialHealth = hero.health;
+const initialLevel = hero.level;
+const initialExperience = hero.experience;
+const initialMoney = hero.money;
 
-while (hero.isAlive() && monster.health > 0) {
-  console.log(`\n--- Round ${round} ---`);
+console.log(`BATTLE BEGINS: ${hero.name} vs ${opponent.name}!`);
+console.log("-------------------------------");
 
-  // Determine initiative
-  const heroInitiative = hero.initiative;
-  const monsterInitiative = monster.initiative;
+// Battle simulation using the refactored BattleService
+const battleService = new BattleService(hero, opponent);
+const result = battleService.battle();
 
-  console.log(
-    `Initiative rolls: ${hero.name}: ${heroInitiative.toFixed(2)}, ${
-      monster.name
-    }: ${monsterInitiative.toFixed(2)}`
-  );
+// Display battle logs
+result.log.forEach((entry) => console.log(entry));
 
-  // Hero attacks first if higher initiative
-  if (heroInitiative >= monsterInitiative) {
-    // Hero's turn
-    const heroAttack = hero.attack;
-    console.log(`${hero.name} attacks ${monster.name}!`);
-    if (heroAttack.isCriticalHit) {
-      console.log(`CRITICAL HIT! Damage doubled!`);
-    }
+console.log("-------------------------------");
+console.log(`BATTLE OVER: ${result.winner.name} WINS!`);
+console.log("-------------------------------");
 
-    const monsterDefense = monster.defend(heroAttack.damages);
-    console.log(
-      `${monster.name} ${
-        monsterDefense.partialDodge ? "partially dodges" : "takes full impact"
-      }!`
-    );
-    console.log(
-      `${monster.name} takes ${monsterDefense.damagesTaken} damage. Health: ${monster.health}`
-    );
-
-    // Check if monster is defeated
-    if (monster.health <= 0) {
-      console.log(`${monster.name} has been defeated!`);
-      hero.gainExperience(monster.level * 20);
-      console.log(
-        `${hero.name} gains ${monster.level * 20} experience points.`
-      );
-      break;
-    }
-
-    // Monster's turn
-    const monsterAttack = monster.attack;
-    console.log(`${monster.name} attacks ${hero.name}!`);
-    if (monsterAttack.isCriticalHit) {
-      console.log(`CRITICAL HIT! Damage doubled!`);
-    }
-
-    const heroDefense = hero.defend(monsterAttack.damages);
-    console.log(
-      `${hero.name} ${
-        heroDefense.partialDodge ? "partially dodges" : "takes full impact"
-      }!`
-    );
-    console.log(
-      `${hero.name} takes ${heroDefense.damagesTaken} damage. Health: ${hero.health}`
-    );
-  } else {
-    // Monster attacks first
-    const monsterAttack = monster.attack;
-    console.log(`${monster.name} attacks ${hero.name}!`);
-    if (monsterAttack.isCriticalHit) {
-      console.log(`CRITICAL HIT! Damage doubled!`);
-    }
-
-    const heroDefense = hero.defend(monsterAttack.damages);
-    console.log(
-      `${hero.name} ${
-        heroDefense.partialDodge ? "partially dodges" : "takes full impact"
-      }!`
-    );
-    console.log(
-      `${hero.name} takes ${heroDefense.damagesTaken} damage. Health: ${hero.health}`
-    );
-
-    // Check if hero is defeated
-    if (hero.isDead()) {
-      console.log(`${hero.name} has been defeated!`);
-      break;
-    }
-
-    // Hero's turn
-    const heroAttack = hero.attack;
-    console.log(`${hero.name} attacks ${monster.name}!`);
-    if (heroAttack.isCriticalHit) {
-      console.log(`CRITICAL HIT! Damage doubled!`);
-    }
-
-    const monsterDefense = monster.defend(heroAttack.damages);
-    console.log(
-      `${monster.name} ${
-        monsterDefense.partialDodge ? "partially dodges" : "takes full impact"
-      }!`
-    );
-    console.log(
-      `${monster.name} takes ${monsterDefense.damagesTaken} damage. Health: ${monster.health}`
-    );
-  }
-
-  round++;
-}
-
-// Combat results
-if (hero.isAlive()) {
-  console.log(`\nVICTORY! ${hero.name} has defeated the ${monster.name}!`);
-  console.log(`Experience: ${hero.experience}`);
-  console.log(`Level: ${hero.level}`);
-
-  // Sell an item
-  if (hero.storage && hero.storage.items.length > 0) {
-    const itemToSell = hero.storage.items[0];
-    console.log(`\nSelling ${itemToSell.name}...`);
-    const sold = hero.sellItem(itemToSell);
-    console.log(`Item sold successfully: ${sold}`);
-    console.log(`${hero.name}'s money: ${hero.money} gold coins`);
-
-    console.log("\nUpdated backpack contents:");
-    hero.storage.items.forEach((item, index) => {
-      console.log(`${index + 1}. ${item.name}`);
-    });
-  }
-} else {
-  console.log(`\nDEFEAT! ${hero.name} has been slain by the ${monster.name}!`);
-  console.log("Game Over!");
-}
+// Hero status summary after battle
+console.log("\nHERO STATUS AFTER BATTLE:");
+console.log(`Health: ${initialHealth} → ${hero.health}`);
+console.log(`Level: ${initialLevel} → ${hero.level}`);
+console.log(`Experience: ${initialExperience} → ${hero.experience}`);
+console.log(`Money: ${initialMoney} → ${hero.money}`);
 
 console.log("\n-------------------------------");
 console.log("End of RPG Game Test Scenario");

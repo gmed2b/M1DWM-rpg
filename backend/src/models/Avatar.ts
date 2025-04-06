@@ -43,4 +43,12 @@ export class Avatar {
       damagesTaken,
     };
   }
+
+  get isDead(): boolean {
+    return this.health <= 0;
+  }
+
+  get isAlive(): boolean {
+    return !this.isDead;
+  }
 }

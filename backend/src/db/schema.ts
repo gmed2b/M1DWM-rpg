@@ -1,7 +1,7 @@
 // schema.ts
 
 import { relations, sql } from "drizzle-orm";
-import { integer, real, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 // ========== USER ============
 export const users = sqliteTable("users", {
@@ -9,16 +9,11 @@ export const users = sqliteTable("users", {
   username: text("username").notNull().unique(),
   email: text("email").notNull().unique(),
   password: text("password").notNull(),
-  displayName: text("display_name").notNull(),
   avatar: text("avatar"),
+  lastLogin: integer("last_login", { mode: "timestamp" }),
   createdAt: integer("created_at", { mode: "timestamp" })
     .notNull()
     .default(sql`(CURRENT_TIMESTAMP)`),
-  lastLogin: integer("last_login", { mode: "timestamp" }),
-  isActive: integer("is_active", { mode: "boolean" }).notNull().default(true),
-  experience: integer("experience").notNull().default(0),
-  level: integer("level").notNull().default(1),
-  money: integer("money").notNull().default(0),
 });
 
 export type InsertUser = typeof users.$inferInsert;

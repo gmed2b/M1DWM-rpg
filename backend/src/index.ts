@@ -1,16 +1,15 @@
 import { Hono } from "hono";
-import routes from "./routes";
+import { logger } from "hono/logger";
+import userRoutes from "./routes/userRoutes";
 
 const app = new Hono();
 
-app.get("/", (c) => {
-  return c.json({
-    message: "Hello, world!",
-  });
-});
+app.use(logger());
 
-for (const [path, app] of Object.entries(routes)) {
-  app.route(path, app);
-}
+app.get("/", (c) =>
+  c.json({ status: "Server is running", time: new Date().toISOString() })
+);
+
+app.route("/api/users", userRoutes);
 
 export default app;

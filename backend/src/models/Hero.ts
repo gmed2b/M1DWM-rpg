@@ -18,14 +18,6 @@ export class Hero extends Avatar {
     super(name, race, classType, level, stats);
   }
 
-  isDead(): boolean {
-    return this.health <= 0;
-  }
-
-  isAlive(): boolean {
-    return !this.isDead();
-  }
-
   gainExperience(amount: number): void {
     this.experience += amount;
     if (this.experience >= this.level * 100) {

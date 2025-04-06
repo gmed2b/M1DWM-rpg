@@ -1,16 +1,18 @@
 // BattleService.ts
+import { Avatar } from "../models/Avatar";
 import { Hero } from "../models/Hero";
+import { Mob } from "../models/Mob";
 
 /**
  * This service is responsible for handling the battle logic
  * between two players with detailed battle logging.
  */
 export class BattleService {
-  private attacker: Hero;
-  private defender: Hero;
+  private attacker: Avatar;
+  private defender: Avatar;
   private battleLog: string[] = [];
 
-  constructor(private player: Hero, private opponent: Hero) {
+  constructor(private player: Hero, private opponent: Avatar) {
     // Initialize battle log
     this.logInitiative();
 
@@ -76,7 +78,7 @@ export class BattleService {
     );
 
     // Return true if defender is defeated, false otherwise
-    if (this.defender.isDead()) {
+    if (this.defender.isDead) {
       this.log(`${this.defender.name} has been defeated!`);
       this.processVictoryRewards();
       return true;
@@ -141,9 +143,9 @@ export class BattleService {
       this.swapAttacker();
 
       round++;
-    } while (this.player.isAlive() && this.opponent.isAlive());
+    } while (this.player.isAlive && this.opponent.isAlive);
 
-    const winner = this.player.isAlive() ? this.player : this.opponent;
+    const winner = this.player.isAlive ? this.player : this.opponent;
     const loser = winner === this.player ? this.opponent : this.player;
 
     return {
@@ -167,8 +169,8 @@ export class BattleService {
 }
 
 export interface BattleResult {
-  winner: Hero;
-  loser: Hero;
+  winner: Avatar;
+  loser: Avatar;
   rounds: number;
   log: string[];
 }
