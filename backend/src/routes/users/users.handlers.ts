@@ -10,14 +10,19 @@ import { ZOD_ERROR_CODES, ZOD_ERROR_MESSAGES } from "@/lib/constants";
 
 import type { CreateRoute, GetOneRoute, ListRoute, PatchRoute, RemoveRoute } from "./users.routes";
 
+import { hashPassword } from "./users.index";
+
 export const list: AppRouteHandler<ListRoute> = async (c) => {
   const users = await db.query.users.findMany();
   return c.json(users);
 };
 
 export const create: AppRouteHandler<CreateRoute> = async (c) => {
-  const user = c.req.valid("json");
-  const [inserted] = await db.insert(users).values(user).returning();
+  const payload = c.req.valid("json");
+  const [inserted] = await db.insert(users).values({
+    ...payload,
+    password: await hashPassword(payload.password),
+  }).returning();
   return c.json(inserted, HttpStatusCodes.CREATED);
 };
 

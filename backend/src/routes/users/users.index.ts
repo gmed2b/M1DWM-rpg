@@ -10,4 +10,9 @@ const router = createRouter()
   .openapi(routes.patch, handlers.patch)
   .openapi(routes.remove, handlers.remove);
 
+// Helper function to hash passwords
+export async function hashPassword(password: string): Promise<string> {
+  return await Bun.password.hash(password);
+}
+
 export default router;

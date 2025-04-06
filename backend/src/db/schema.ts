@@ -10,7 +10,9 @@ export const users = sqliteTable("users", {
     () => new Date(),
   ),
 });
+
 export const selectUsersSchema = createSelectSchema(users);
+
 export const insertUsersSchema = createInsertSchema(users, {
   username: s => s.nonempty().min(1).max(50),
   password: s => s.nonempty().min(8).max(100),
@@ -19,4 +21,5 @@ export const insertUsersSchema = createInsertSchema(users, {
   avatar: true,
   createdAt: true,
 });
+
 export const patchUsersSchema = insertUsersSchema.partial();
