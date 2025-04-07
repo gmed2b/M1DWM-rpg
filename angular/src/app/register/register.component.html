@@ -73,81 +73,6 @@
         </div>
       </div>
 
-      <!-- Choix de classe -->
-      <div class="mb-6">
-        <label class="block mb-2">Choisissez votre classe</label>
-        <select
-          class="rpgui-list"
-          id="background-select"
-          size="5"
-          data-rpguitype="list"
-          style="display: none"
-        >
-          <option value="Blacksmith">Blacksmith</option>
-          <option value="Merchant">Merchant</option>
-          <option value="City Guard">City Guard</option>
-          <option value="Alchemist">Alchemist</option>
-          <option value="Explorer">Explorer</option>
-          <option value="Thug">Thug</option>
-          <option value="Mercenary">Mercenary</option>
-          <option value="Royalty">Royalty</option>
-          <option value="Gladiator">Gladiator</option>
-        </select>
-        <ul
-          id="background-select-rpgui-list"
-          class="rpgui-list-imp"
-          style="height: 140px"
-        >
-          <li data-rpguivalue="Blacksmith" class=" ">Blacksmith</li>
-          <li data-rpguivalue="Merchant" class=" ">Merchant</li>
-          <li data-rpguivalue="City Guard" class="">City Guard</li>
-          <li data-rpguivalue="Alchemist" class=" ">Alchemist</li>
-          <li data-rpguivalue="Explorer" class="rpgui-selected">Explorer</li>
-          <li data-rpguivalue="Thug" class="">Thug</li>
-          <li data-rpguivalue="Mercenary" class="">Mercenary</li>
-          <li data-rpguivalue="Royalty" class="">Royalty</li>
-          <li data-rpguivalue="Gladiator" class="">Gladiator</li>
-        </ul>
-        <div
-          *ngIf="
-            characterClass.invalid &&
-            (characterClass.dirty || characterClass.touched)
-          "
-          class="text-red-400 text-sm"
-        >
-          <div *ngIf="characterClass.errors?.['required']">
-            Choisissez une classe
-          </div>
-        </div>
-      </div>
-
-      <!-- Conditions d'utilisation -->
-      <div class="flex items-center mb-6">
-        <input
-          type="checkbox"
-          formControlName="termsAccepted"
-          class="rpgui-checkbox"
-          id="termsAccepted"
-        />
-        <label for="termsAccepted" class="ml-2">
-          J'accepte les
-          <span class="rpgui-cursor-point text-yellow-400"
-            >conditions d'utilisation</span
-          >
-        </label>
-        <div
-          *ngIf="
-            termsAccepted.invalid &&
-            (termsAccepted.dirty || termsAccepted.touched)
-          "
-          class="text-red-400 text-sm ml-2"
-        >
-          <div *ngIf="termsAccepted.errors?.['required']">
-            Vous devez accepter les conditions
-          </div>
-        </div>
-      </div>
-
       <!-- Boutons d'action -->
       <div class="flex flex-col gap-3">
         <button
@@ -156,10 +81,6 @@
           [disabled]="registerForm.invalid"
         >
           <p>CRÉER MON AVENTURIER</p>
-        </button>
-
-        <button type="button" class="rpgui-button" (click)="onCancel()">
-          <p>RETOUR</p>
         </button>
       </div>
     </form>

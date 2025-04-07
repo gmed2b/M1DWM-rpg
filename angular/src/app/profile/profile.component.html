@@ -1,0 +1,183 @@
+<main class="rpgui-container framed">
+  <h1 class="!text-2xl">Profil d'Aventurier</h1>
+  <hr class="golden mb-8" />
+
+  <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-8">
+    <!-- SECTION 1: INFORMATIONS DE COMPTE -->
+    <section class="rpgui-container framed-golden">
+      <h2>Compte</h2>
+      <hr />
+
+      <div class="flex flex-col items-center mb-6">
+        <!-- Avatar -->
+        <div
+          class="rpgui-icon empty-slot mb-4"
+          style="width: 120px; height: 120px"
+        >
+          <img
+            *ngIf="user?.avatar"
+            [src]="user?.avatar || 'assets/avatars/default.png'"
+            alt="Avatar de l'utilisateur"
+            style="width: 100%; height: 100%"
+          />
+          <div
+            *ngIf="!user?.avatar"
+            class="flex items-center justify-center h-full"
+          >
+            <span class="text-sm text-center">Aucun avatar</span>
+          </div>
+        </div>
+
+        <!-- Nom d'utilisateur -->
+        <h3 class="!text-xl mb-2">{{ user?.username || "Aventurier" }}</h3>
+        <span class="text-sm"
+          >Membre depuis {{ user?.joinDate | date : "dd/MM/yyyy" }}</span
+        >
+      </div>
+
+      <!-- Statistiques du compte -->
+      <div class="mb-6">
+        <div class="flex justify-between mb-2">
+          <span>Personnages:</span>
+          <span>{{ characters?.length || 0 }}</span>
+        </div>
+        <div class="flex justify-between mb-2">
+          <span>Dernière connexion:</span>
+          <span>{{ user?.lastLogin | date : "dd/MM/yyyy" }}</span>
+        </div>
+      </div>
+
+      <!-- Boutons d'action -->
+      <div class="flex gap-2 mt-4">
+        <button class="rpgui-button" type="button">
+          <p>MODIFIER L'AVATAR</p>
+        </button>
+        <button class="rpgui-button" type="button">
+          <p>CHANGER MOT DE PASSE</p>
+        </button>
+      </div>
+    </section>
+
+    <!-- SECTION 2: STATISTIQUES DE JEU  -->
+    <section class="rpgui-container framed-golden">
+      <h2>Statistiques de Jeu</h2>
+      <hr class="golden" />
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <div
+          class="rpgui-container framed-grey-sm flex flex-col items-center p-4"
+        >
+          <h3>Quêtes complétées</h3>
+          <span class="rpgui-text-shadow text-2xl">{{
+            user?.stats?.completedQuests || 0
+          }}</span>
+        </div>
+
+        <div
+          class="rpgui-container framed-grey-sm flex flex-col items-center p-4"
+        >
+          <h3>Combats gagnés</h3>
+          <span class="rpgui-text-shadow text-2xl">{{
+            user?.stats?.victories || 0
+          }}</span>
+        </div>
+
+        <div
+          class="rpgui-container framed-grey-sm flex flex-col items-center p-4"
+        >
+          <h3>Or total</h3>
+          <span class="rpgui-text-shadow text-2xl text-yellow-400">{{
+            user?.stats?.totalGold || 0
+          }}</span>
+        </div>
+
+        <div
+          class="rpgui-container framed-grey-sm flex flex-col items-center p-4"
+        >
+          <h3>Temps de jeu</h3>
+          <span class="rpgui-text-shadow text-2xl">{{
+            formatPlayTime(user?.stats?.playTime)
+          }}</span>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- SECTION LISTE DES PERSONNAGES-->
+  <section class="rpgui-container framed-golden">
+    <div class="flex justify-between items-center">
+      <h2>Mes Personnages</h2>
+      <button class="rpgui-button" type="button" (click)="onCreateCharacter()">
+        <p>CRÉER</p>
+      </button>
+    </div>
+    <hr />
+
+    <div
+      *ngIf="characters && characters.length > 0; else noCharacters"
+      class="max-h-96 overflow-y-auto"
+    >
+      <table class="rpgui-container framed w-full mb-4">
+        <thead>
+          <tr class="rpgui-container framed-grey-sm p-2">
+            <th class="text-left p-2">Nom</th>
+            <th class="text-left p-2">Classe</th>
+            <th class="text-center p-2">Niveau</th>
+            <th class="text-center p-2">Statut</th>
+            <th class="text-right p-2">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="text-white!">
+          <tr
+            *ngFor="let character of characters"
+            class="border-b border-gray-700"
+          >
+            <td class="p-2">
+              {{ character.name }}
+            </td>
+            <td class="p-2 flex items-center">
+              <div
+                class="rpgui-icon {{ getClassIcon(character.class) }} mr-2"
+              ></div>
+              {{ character.class }}
+            </td>
+            <td class="p-2 text-center">{{ character.level }}</td>
+            <td class="p-2 text-center">
+              <span
+                *ngIf="character.isActive"
+                class="rpgui-text-shadow text-green-400!"
+                >Actif</span
+              >
+              <span *ngIf="!character.isActive" class="text-gray-400!"
+                >Inactif</span
+              >
+            </td>
+            <td class="p-2 text-right">
+              <button
+                *ngIf="!character.isActive"
+                class="rpgui-button golden"
+                type="button"
+                (click)="onSelectCharacter(character)"
+              >
+                <p>SÉLECTIONNER</p>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <ng-template #noCharacters>
+      <div class="rpgui-container framed-grey p-6 text-center">
+        <p class="mb-4">Vous n'avez pas encore de personnage.</p>
+        <button
+          class="rpgui-button golden"
+          type="button"
+          (click)="onCreateCharacter()"
+        >
+          <p>CRÉER MON PREMIER PERSONNAGE</p>
+        </button>
+      </div>
+    </ng-template>
+  </section>
+</main>

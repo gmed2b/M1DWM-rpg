@@ -19,3 +19,16 @@ body {
 .rpgui-button p {
   @apply py-3;
 }
+
+.rpgui-icon.bow {
+  background-image: url("assets/icons/bow.png");
+}
+.rpgui-icon.coin-bag {
+  background-image: url("assets/icons/coin-bag.png");
+}
+.rpgui-icon.magic-wand {
+  background-image: url("assets/icons/magic-wand.png");
+}
+.rpgui-icon.potion {
+  background-image: url("assets/icons/potion.png");
+}

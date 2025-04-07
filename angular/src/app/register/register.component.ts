@@ -23,11 +23,8 @@ export class RegisterComponent implements OnInit {
     this.registerForm = this.fb.group(
       {
         username: ['', [Validators.required, Validators.minLength(3)]],
-        email: ['', [Validators.required, Validators.email]],
         password: ['', [Validators.required, Validators.minLength(6)]],
         confirmPassword: ['', [Validators.required]],
-        characterClass: ['', [Validators.required]],
-        termsAccepted: [false, [Validators.requiredTrue]],
       },
       {
         validators: this.passwordMatchValidator,
@@ -41,20 +38,11 @@ export class RegisterComponent implements OnInit {
   get username() {
     return this.registerForm.get('username')!;
   }
-  get email() {
-    return this.registerForm.get('email')!;
-  }
   get password() {
     return this.registerForm.get('password')!;
   }
   get confirmPassword() {
     return this.registerForm.get('confirmPassword')!;
-  }
-  get characterClass() {
-    return this.registerForm.get('characterClass')!;
-  }
-  get termsAccepted() {
-    return this.registerForm.get('termsAccepted')!;
   }
 
   // Validateur personnalisé pour vérifier que les mots de passe correspondent
@@ -90,10 +78,5 @@ export class RegisterComponent implements OnInit {
         this.markFormGroupTouched(control);
       }
     });
-  }
-
-  onCancel(): void {
-    // Retour à la page de connexion
-    this.router.navigate(['/login']);
   }
 }
