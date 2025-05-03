@@ -3,7 +3,11 @@ import * as HttpStatusCodes from "stoker/http-status-codes";
 import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers";
 import { createErrorSchema, IdParamsSchema } from "stoker/openapi/schemas";
 
-import { insertUsersSchema, patchUsersSchema, selectUsersSchema } from "@/db/schema";
+import {
+  insertUsersSchema,
+  patchUsersSchema,
+  selectUsersSchema,
+} from "@/db/schema";
 import { notFoundSchema } from "@/lib/constants";
 
 const tags = ["Users"];
@@ -24,10 +28,7 @@ export const create = createRoute({
   path: "/users",
   method: "post",
   request: {
-    body: jsonContentRequired(
-      insertUsersSchema,
-      "The user to create",
-    ),
+    body: jsonContentRequired(insertUsersSchema, "The user to create"),
   },
   tags,
   responses: {
@@ -50,14 +51,8 @@ export const getOne = createRoute({
   },
   tags,
   responses: {
-    [HttpStatusCodes.OK]: jsonContent(
-      selectUsersSchema,
-      "The requested user",
-    ),
-    [HttpStatusCodes.NOT_FOUND]: jsonContent(
-      notFoundSchema,
-      "User not found",
-    ),
+    [HttpStatusCodes.OK]: jsonContent(selectUsersSchema, "The requested user"),
+    [HttpStatusCodes.NOT_FOUND]: jsonContent(notFoundSchema, "User not found"),
     [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
       createErrorSchema(IdParamsSchema),
       "Invalid id error",
@@ -70,24 +65,14 @@ export const patch = createRoute({
   method: "patch",
   request: {
     params: IdParamsSchema,
-    body: jsonContentRequired(
-      patchUsersSchema,
-      "The user updates",
-    ),
+    body: jsonContentRequired(patchUsersSchema, "The user updates"),
   },
   tags,
   responses: {
-    [HttpStatusCodes.OK]: jsonContent(
-      selectUsersSchema,
-      "The updated user",
-    ),
-    [HttpStatusCodes.NOT_FOUND]: jsonContent(
-      notFoundSchema,
-      "User not found",
-    ),
+    [HttpStatusCodes.OK]: jsonContent(selectUsersSchema, "The updated user"),
+    [HttpStatusCodes.NOT_FOUND]: jsonContent(notFoundSchema, "User not found"),
     [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
-      createErrorSchema(patchUsersSchema)
-        .or(createErrorSchema(IdParamsSchema)),
+      createErrorSchema(patchUsersSchema).or(createErrorSchema(IdParamsSchema)),
       "The validation error(s)",
     ),
   },
@@ -104,10 +89,7 @@ export const remove = createRoute({
     [HttpStatusCodes.NO_CONTENT]: {
       description: "User deleted",
     },
-    [HttpStatusCodes.NOT_FOUND]: jsonContent(
-      notFoundSchema,
-      "User not found",
-    ),
+    [HttpStatusCodes.NOT_FOUND]: jsonContent(notFoundSchema, "User not found"),
     [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
       createErrorSchema(IdParamsSchema),
       "Invalid id error",

@@ -1,12 +1,12 @@
-import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import * as sql from "drizzle-orm/sqlite-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 
-export const users = sqliteTable("users", {
-  id: integer("id").primaryKey(),
-  username: text("username").notNull().unique(),
-  password: text("password").notNull(),
-  avatar: text("avatar"),
-  createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(
+export const users = sql.sqliteTable("users", {
+  id: sql.integer("id").primaryKey(),
+  username: sql.text("username").notNull().unique(),
+  password: sql.text("password").notNull(),
+  avatar: sql.text("avatar"),
+  createdAt: sql.integer("created_at", { mode: "timestamp" }).$defaultFn(
     () => new Date(),
   ),
 });

@@ -8,7 +8,13 @@ import db from "@/db";
 import { users } from "@/db/schema";
 import { ZOD_ERROR_CODES, ZOD_ERROR_MESSAGES } from "@/lib/constants";
 
-import type { CreateRoute, GetOneRoute, ListRoute, PatchRoute, RemoveRoute } from "./users.routes";
+import type {
+  CreateRoute,
+  GetOneRoute,
+  ListRoute,
+  PatchRoute,
+  RemoveRoute,
+} from "./users.routes";
 
 import { hashPassword } from "./users.index";
 
@@ -19,10 +25,13 @@ export const list: AppRouteHandler<ListRoute> = async (c) => {
 
 export const create: AppRouteHandler<CreateRoute> = async (c) => {
   const payload = c.req.valid("json");
-  const [inserted] = await db.insert(users).values({
-    ...payload,
-    password: await hashPassword(payload.password),
-  }).returning();
+  const [inserted] = await db
+    .insert(users)
+    .values({
+      ...payload,
+      password: await hashPassword(payload.password),
+    })
+    .returning();
   return c.json(inserted, HttpStatusCodes.CREATED);
 };
 
@@ -69,7 +78,8 @@ export const patch: AppRouteHandler<PatchRoute> = async (c) => {
     );
   }
 
-  const [user] = await db.update(users)
+  const [user] = await db
+    .update(users)
     .set(updates)
     .where(eq(users.id, id))
     .returning();
@@ -88,8 +98,7 @@ export const patch: AppRouteHandler<PatchRoute> = async (c) => {
 
 export const remove: AppRouteHandler<RemoveRoute> = async (c) => {
   const { id } = c.req.valid("param");
-  const result = await db.delete(users)
-    .where(eq(users.id, id));
+  const result = await db.delete(users).where(eq(users.id, id));
 
   if (result.rowsAffected === 0) {
     return c.json(
