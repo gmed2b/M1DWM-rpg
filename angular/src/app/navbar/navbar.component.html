@@ -2,9 +2,26 @@
   class="rpgui-container framed-golden-2 flex items-center justify-between mb-10"
 >
   <h1>RPG Adventure</h1>
-  <div class="flex items-center gap-6">
-    <a class="rpgui-button golden" href="/profile">
-      <p>{{ username }}</p>
-    </a>
-  </div>
+  <ng-container *ngIf="isLoggedIn">
+    <div class="flex items-center gap-6">
+      <button class="rpgui-button" (click)="onHome()">
+        <p>Accueil</p>
+      </button>
+    </div>
+    <div class="flex items-center gap-6">
+      <a class="rpgui-button golden" (click)="onProfile()">
+        <p>{{ username }}</p>
+      </a>
+      <button class="rpgui-button" type="button" (click)="onLogout()">
+        <p>Déconnexion</p>
+      </button>
+    </div>
+  </ng-container>
+  <ng-container *ngIf="!isLoggedIn">
+    <div class="flex items-center gap-6">
+      <button class="rpgui-button" (click)="onLogin()">
+        <p>Connexion</p>
+      </button>
+    </div>
+  </ng-container>
 </nav>
