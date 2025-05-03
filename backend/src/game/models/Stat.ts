@@ -5,7 +5,7 @@ export class Stat {
     public agility: number,
     public speed: number,
     public charisma: number,
-    public luck: number
+    public luck: number,
   ) {}
 
   // Statistiques dérivées

@@ -1,9 +1,9 @@
+import { BattleService } from "./BattleService";
 import { Hero } from "./models/Hero";
 import { Item } from "./models/Item";
 import { Mob } from "./models/Mob";
 import { Stat } from "./models/Stat";
 import { StorageType } from "./models/StorageType";
-import { BattleService } from "./services/BattleService";
 
 // GameTest.ts
 console.log("Starting RPG Game Test Scenario");
@@ -23,7 +23,7 @@ const hero = new Hero(
   "Warrior",
   5,
   heroStats,
-  heroBackpack
+  heroBackpack,
 );
 
 // 4. Create a monster
@@ -95,7 +95,7 @@ const battleService = new BattleService(hero, opponent);
 const result = battleService.battle();
 
 // Display battle logs
-result.log.forEach((entry) => console.log(entry));
+result.log.forEach(entry => console.log(entry));
 
 console.log("-------------------------------");
 console.log(`BATTLE OVER: ${result.winner.name} WINS!`);

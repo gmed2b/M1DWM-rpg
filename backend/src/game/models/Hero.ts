@@ -1,7 +1,8 @@
+import type { Item } from "./Item";
+import type { Stat } from "./Stat";
+import type { StorageType } from "./StorageType";
+
 import { Avatar } from "./Avatar";
-import { Item } from "./Item";
-import { Stat } from "./Stat";
-import { StorageType } from "./StorageType";
 
 export class Hero extends Avatar {
   public money: number = 0;
@@ -13,7 +14,7 @@ export class Hero extends Avatar {
     classType: string,
     level: number,
     stats: Stat,
-    public storage: StorageType | null = null
+    public storage: StorageType | null = null,
   ) {
     super(name, race, classType, level, stats);
   }

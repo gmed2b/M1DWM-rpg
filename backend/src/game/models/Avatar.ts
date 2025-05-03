@@ -1,4 +1,4 @@
-import { Stat } from "./Stat";
+import type { Stat } from "./Stat";
 
 export class Avatar {
   public health: number;
@@ -8,7 +8,7 @@ export class Avatar {
     public race: string,
     public classType: string,
     public level: number,
-    public stats: Stat
+    public stats: Stat,
   ) {
     this.health = stats.baseHealth;
   }
@@ -33,8 +33,8 @@ export class Avatar {
     partialDodge: boolean;
     damagesTaken: number;
   } {
-    const dodgeChance =
-      this.stats.agility + this.stats.speed + this.stats.endurance;
+    const dodgeChance
+      = this.stats.agility + this.stats.speed + this.stats.endurance;
     const partialDodge = Math.random() < dodgeChance / 100;
     const damagesTaken = partialDodge ? Math.round(damages / 2) : damages;
     this.health = Math.max(0, this.health - damagesTaken);

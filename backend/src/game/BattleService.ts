@@ -1,7 +1,6 @@
 // BattleService.ts
-import { Avatar } from "../models/Avatar";
-import { Hero } from "../models/Hero";
-import { Mob } from "../models/Mob";
+import type { Avatar } from "../game/models/Avatar";
+import type { Hero } from "../game/models/Hero";
 
 /**
  * This service is responsible for handling the battle logic
@@ -20,7 +19,8 @@ export class BattleService {
     if (this.player.initiative > this.opponent.initiative) {
       this.attacker = player;
       this.defender = opponent;
-    } else {
+    }
+    else {
       this.attacker = opponent;
       this.defender = player;
     }
@@ -32,8 +32,8 @@ export class BattleService {
   private logInitiative(): void {
     this.log(
       `Initiative rolls: ${this.player.name}: ${this.player.initiative.toFixed(
-        2
-      )}, ` + `${this.opponent.name}: ${this.opponent.initiative.toFixed(2)}`
+        2,
+      )}, ` + `${this.opponent.name}: ${this.opponent.initiative.toFixed(2)}`,
     );
   }
 
@@ -69,12 +69,13 @@ export class BattleService {
 
     if (defense.partialDodge) {
       this.log(`${this.defender.name} partially dodges the attack!`);
-    } else {
+    }
+    else {
       this.log(`${this.defender.name} takes full impact!`);
     }
 
     this.log(
-      `${this.defender.name} takes ${defense.damagesTaken} damage. Health: ${this.defender.health}`
+      `${this.defender.name} takes ${defense.damagesTaken} damage. Health: ${this.defender.health}`,
     );
 
     // Return true if defender is defeated, false otherwise
@@ -101,7 +102,7 @@ export class BattleService {
 
       if (this.player.level > initialLevel) {
         this.log(
-          `LEVEL UP! ${this.player.name} reached level ${this.player.level}!`
+          `LEVEL UP! ${this.player.name} reached level ${this.player.level}!`,
         );
       }
 
@@ -123,7 +124,7 @@ export class BattleService {
 
       // Ajout de l'affichage de la vie des joueurs au début du round
       this.log(
-        `${this.player.name}: ${this.player.health} HP | ${this.opponent.name}: ${this.opponent.health} HP`
+        `${this.player.name}: ${this.player.health} HP | ${this.opponent.name}: ${this.opponent.health} HP`,
       );
 
       // First combatant's turn

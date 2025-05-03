@@ -3,7 +3,7 @@ export class Item {
     public name: string,
     public type: string,
     public price: number,
-    public durability: number
+    public durability: number,
   ) {}
 
   get description(): string {
@@ -14,8 +14,10 @@ export class Item {
   }
 
   get rarity(): string {
-    if (this.price < 10) return "common";
-    if (this.price < 100) return "rare";
+    if (this.price < 10)
+      return "common";
+    if (this.price < 100)
+      return "rare";
     return "legendary";
   }
 }

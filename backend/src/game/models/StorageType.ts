@@ -1,4 +1,4 @@
-import { Item } from "./Item";
+import type { Item } from "./Item";
 
 export class StorageType {
   public items: Item[] = [];
