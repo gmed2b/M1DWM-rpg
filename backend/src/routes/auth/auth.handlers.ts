@@ -1,3 +1,4 @@
+import { setSignedCookie } from "hono/cookie";
 import { sign } from "hono/jwt";
 import * as HttpStatusCodes from "stoker/http-status-codes";
 
@@ -66,7 +67,7 @@ export const login: AppRouteHandler<LoginRoute> = async (c) => {
       {
         message: "Username or password is incorrect",
       },
-      HttpStatusCodes.NOT_FOUND,
+      HttpStatusCodes.FORBIDDEN,
     );
   }
   const isPasswordValid = await Bun.password.verify(req.password, user.password);
@@ -75,20 +76,22 @@ export const login: AppRouteHandler<LoginRoute> = async (c) => {
       {
         message: "Username or password is incorrect",
       },
-      HttpStatusCodes.NOT_FOUND,
+      HttpStatusCodes.FORBIDDEN,
     );
   }
 
   const payload = {
     sub: user.id,
     ...user,
-    exp: Math.floor(Date.now() / 1000) + 60 * 5,
+    exp: Math.floor(Date.now() / 1000) + env.ACCESS_TOKEN_EXPIRES_IN,
   };
-  const token = await sign(payload, env.JWT_SECRET);
+  const accessToken = await sign(payload, env.ACCESS_TOKEN_SECRET);
+  const refreshToken = await sign(payload, env.REFRESH_TOKEN_SECRET);
 
   return c.json(
     {
-      token,
+      accessToken,
+      refreshToken,
       user: payload,
     },
     HttpStatusCodes.OK,

@@ -5,8 +5,6 @@ import { createErrorSchema, createMessageObjectSchema } from "stoker/openapi/sch
 
 import { selectUsersSchema } from "@/db/schema";
 
-const tags = ["Auth"];
-
 const registerSchema = z.object({
   username: z.string().nonempty(),
   password: z.string().nonempty(),
@@ -14,15 +12,15 @@ const registerSchema = z.object({
 });
 
 export const register = createRoute({
-  path: "/register",
+  path: "/auth/register",
   method: "post",
+  tags: ["Auth"],
   request: {
     body: jsonContentRequired(
       registerSchema,
       "The credentials to register",
     ),
   },
-  tags,
   responses: {
     [HttpStatusCodes.CREATED]: jsonContent(
       z.object({
@@ -52,7 +50,7 @@ const loginSchema = z.object({
 });
 
 export const login = createRoute({
-  path: "/login",
+  path: "/auth/login",
   method: "post",
   request: {
     body: jsonContentRequired(
@@ -60,16 +58,17 @@ export const login = createRoute({
       "The credentials to login",
     ),
   },
-  tags,
+  tags: ["Auth"],
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
       z.object({
-        token: z.string(),
+        accessToken: z.string(),
+        refreshToken: z.string(),
         user: selectUsersSchema,
       }),
       "The login response",
     ),
-    [HttpStatusCodes.NOT_FOUND]: jsonContent(
+    [HttpStatusCodes.FORBIDDEN]: jsonContent(
       createMessageObjectSchema("Username or password is incorrect"),
       "The user was not found",
     ),

@@ -1,6 +1,7 @@
 import configureOpenAPI from "@/lib/configure-open-api";
 import createApp from "@/lib/create-app";
 import auth from "@/routes/auth/auth.index";
+import heroes from "@/routes/heroes/heroes.index";
 import index from "@/routes/index.route";
 
 const app = createApp();
@@ -10,6 +11,7 @@ configureOpenAPI(app);
 const routes = [
   index,
   auth,
+  heroes,
 ] as const;
 
 routes.forEach((route) => {

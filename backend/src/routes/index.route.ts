@@ -20,7 +20,7 @@ const router = createRouter()
     }),
     (c) => {
       return c.json({
-        message: "RPG REST API",
+        message: "RPG REST API"
       }, HttpStatusCodes.OK);
     },
   );
