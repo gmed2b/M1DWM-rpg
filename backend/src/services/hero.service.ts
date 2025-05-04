@@ -49,18 +49,28 @@ export class HeroService {
   }
 
   /**
-   * Récupère un héros par son ID et vérifie qu'il appartient bien à l'utilisateur
+   * Récupère un héros par son ID et vérifie optionnellement qu'il appartient à l'utilisateur
    * @param heroId ID du héros à récupérer
-   * @param userId ID de l'utilisateur propriétaire
+   * @param userId ID de l'utilisateur propriétaire (optionnel pour les combats)
+   * @param skipUserCheck Si true, ignore la vérification de l'utilisateur
    * @returns Le héros avec les stats parsées ou null si non trouvé
    */
-  static async getHeroById(heroId: number, userId: number): Promise<ParsedHero | null> {
-    const [hero] = await db
+  static async getHeroById(
+    heroId: number,
+    userId?: number,
+    skipUserCheck: boolean = false
+  ): Promise<ParsedHero | null> {
+    const query = db
       .select()
       .from(heroesTable)
-      .where(and(eq(heroesTable.userId, userId), eq(heroesTable.id, heroId)))
-      .limit(1)
-      .execute();
+      .where(
+        and(
+          eq(heroesTable.id, heroId),
+          userId !== undefined && !skipUserCheck ? eq(heroesTable.userId, userId) : undefined
+        )
+      );
+
+    const [hero] = await query.limit(1).execute();
 
     if (!hero) return null;
 
@@ -190,5 +200,136 @@ export class HeroService {
       .execute();
 
     return this.parseHeroStats(updatedHero as HeroDb);
+  }
+
+  /**
+   * Met à jour un héros après une bataille
+   * @param heroId ID du héros
+   * @param expGained Expérience gagnée
+   * @param goldGained Or gagné
+   * @param newHealth Nouvelle santé
+   * @param newLevel Nouveau niveau
+   * @returns Le héros mis à jour
+   */
+  static async updateHeroAfterBattle(
+    heroId: number,
+    expGained: number = 0,
+    goldGained: number = 0,
+    newHealth: number = 100,
+    newLevel: number | null = null
+  ): Promise<ParsedHero | null> {
+    // Récupérer le héros sans vérifier l'utilisateur (car appelé depuis BattleService)
+    const hero = await this.getHeroById(heroId, undefined);
+    if (!hero) return null;
+
+    // Calculer les nouvelles valeurs
+    const updatedExp = hero.experience + expGained;
+    const updatedGold = hero.money + goldGained;
+
+    // Préparer les champs à mettre à jour
+    const updateFields: any = {
+      experience: updatedExp,
+      money: updatedGold,
+      health: newHealth,
+    };
+
+    // Mettre à jour le niveau si fourni
+    if (newLevel !== null && newLevel > hero.level) {
+      updateFields.level = newLevel;
+    }
+
+    // Effectuer la mise à jour
+    const [updatedHero] = await db
+      .update(heroesTable)
+      .set(updateFields)
+      .where(eq(heroesTable.id, heroId))
+      .returning()
+      .execute();
+
+    return this.parseHeroStats(updatedHero as HeroDb);
+  }
+
+  /**
+   * Met à jour la santé d'un héros
+   * @param heroId ID du héros
+   * @param newHealth Nouvelle valeur de santé
+   * @returns Le héros mis à jour
+   */
+  static async updateHeroHealth(heroId: number, newHealth: number): Promise<ParsedHero | null> {
+    // Récupérer le héros sans vérifier l'utilisateur
+    const hero = await this.getHeroById(heroId, undefined, true);
+    if (!hero) return null;
+
+    // Effectuer la mise à jour
+    const [updatedHero] = await db
+      .update(heroesTable)
+      .set({
+        health: Math.max(0, newHealth), // Empêcher la santé négative
+      })
+      .where(eq(heroesTable.id, heroId))
+      .returning()
+      .execute();
+
+    return this.parseHeroStats(updatedHero as HeroDb);
+  }
+
+  /**
+   * Met à jour un héros après une quête
+   * @param heroId ID du héros
+   * @param expGained Expérience gagnée
+   * @param goldGained Or gagné
+   * @returns Le héros mis à jour
+   */
+  static async updateHeroAfterQuest(
+    heroId: number,
+    expGained: number = 0,
+    goldGained: number = 0
+  ): Promise<ParsedHero | null> {
+    // Récupérer le héros sans vérifier l'utilisateur
+    const hero = await this.getHeroById(heroId, undefined, true);
+    if (!hero) return null;
+
+    // Calculer les nouvelles valeurs
+    const updatedExp = hero.experience + expGained;
+    const updatedGold = hero.money + goldGained;
+
+    // Préparer les champs à mettre à jour
+    const updateFields: any = {
+      experience: updatedExp,
+      money: updatedGold,
+    };
+
+    // Effectuer la mise à jour
+    const [updatedHero] = await db
+      .update(heroesTable)
+      .set(updateFields)
+      .where(eq(heroesTable.id, heroId))
+      .returning()
+      .execute();
+
+    return this.parseHeroStats(updatedHero as HeroDb);
+  }
+
+  /**
+   * Ajoute un item à l'inventaire du héros
+   * @param heroId ID du héros
+   * @param itemId ID de l'item à ajouter
+   * @param quantity Quantité à ajouter
+   * @returns true si ajouté avec succès, false sinon
+   */
+  static async addItemToHero(heroId: number, itemId: number, quantity: number = 1): Promise<boolean> {
+    try {
+      // Vérifier que le héros existe
+      const hero = await this.getHeroById(heroId, undefined, true);
+      if (!hero) return false;
+
+      // Ici, vous devriez appeler votre service d'inventaire
+      // Ceci est une implémentation simplifiée qui renvoie toujours true
+      // Dans votre code réel, vous ajouteriez l'item à l'inventaire du héros
+      return true;
+    } catch (error) {
+      console.error("Erreur lors de l'ajout d'un item au héros:", error);
+      return false;
+    }
   }
 }

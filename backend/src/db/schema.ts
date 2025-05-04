@@ -24,7 +24,10 @@ export const heroesTable = sql.sqliteTable("heroes", {
   health: sql.integer("health").notNull().default(100),
   money: sql.integer("money").notNull().default(0),
   isActive: sql.integer("is_active", { mode: "boolean" }).notNull().default(false),
-  createdAt: sql.integer("created_at", { mode: "timestamp" }).$defaultFn(() => new Date()),
+  createdAt: sql
+    .integer("created_at", { mode: "timestamp" })
+    .$defaultFn(() => new Date())
+    .notNull(),
 });
 
 export const itemsTable = sql.sqliteTable("items", {
@@ -40,7 +43,6 @@ export const inventoryTable = sql.sqliteTable("inventory", {
   heroId: sql.integer("hero_id").references(() => heroesTable.id, { onDelete: "cascade" }),
   itemId: sql.integer("item_id").references(() => itemsTable.id),
   quantity: sql.integer("quantity").notNull().default(1),
-  createdAt: sql.integer("created_at", { mode: "timestamp" }).$defaultFn(() => new Date()),
 });
 
 export const questsTable = sql.sqliteTable("quests", {
@@ -53,32 +55,52 @@ export const questsTable = sql.sqliteTable("quests", {
   rewardItems: sql.text("reward_items"), // JSON string of item IDs
   boardSize: sql.integer("board_size").notNull(),
   encounters: sql.text("encounters"), // JSON string of encounter data
-  createdAt: sql.integer("created_at", { mode: "timestamp" }).$defaultFn(() => new Date()),
 });
 
 export const questProgressTable = sql.sqliteTable("quest_progress", {
   id: sql.integer("id").primaryKey(),
-  heroId: sql.integer("hero_id").references(() => heroesTable.id, { onDelete: "cascade" }),
-  questId: sql.integer("quest_id").references(() => questsTable.id),
+  heroId: sql
+    .integer("hero_id")
+    .references(() => heroesTable.id, { onDelete: "cascade" })
+    .notNull(),
+  questId: sql
+    .integer("quest_id")
+    .references(() => questsTable.id)
+    .notNull(),
   currentPosition: sql.integer("current_position").notNull().default(0),
   isCompleted: sql.integer("is_completed", { mode: "boolean" }).notNull().default(false),
   isActive: sql.integer("is_active", { mode: "boolean" }).notNull().default(true),
-  logData: sql.text("log_data"), // JSON string of quest log
-  createdAt: sql.integer("created_at", { mode: "timestamp" }).$defaultFn(() => new Date()),
-  updatedAt: sql.integer("updated_at", { mode: "timestamp" }).$defaultFn(() => new Date()),
+  logData: sql.text("log_data").notNull(), // JSON string of quest log
 });
 
 export const battlesTable = sql.sqliteTable("battles", {
   id: sql.integer("id").primaryKey(),
-  heroId: sql.integer("hero_id").references(() => heroesTable.id, { onDelete: "cascade" }),
+  heroId: sql
+    .integer("hero_id")
+    .references(() => heroesTable.id, { onDelete: "cascade" })
+    .notNull(),
   opponentType: sql.text("opponent_type").notNull(), // "hero" or "mob"
-  opponentId: sql.integer("opponent_id"), // ID of hero or reference to a mob
-  winnerId: sql.integer("winner_id"),
+  opponentId: sql.integer("opponent_id").notNull(), // ID of hero or reference to a mob
+  winnerId: sql.integer("winner_id").notNull(),
   rounds: sql.integer("rounds").notNull(),
-  battleLog: sql.text("battle_log"), // JSON string of battle log
-  rewardExp: sql.integer("reward_exp"),
-  rewardGold: sql.integer("reward_gold"),
-  rewardItems: sql.text("reward_items"), // JSON string of item IDs
+  battleLog: sql.text("battle_log").notNull(), // JSON string of battle log
+  rewardExp: sql.integer("reward_exp").notNull(),
+  rewardGold: sql.integer("reward_gold").notNull(),
+  rewardItems: sql.text("reward_items").notNull(), // JSON string of item IDs
+  createdAt: sql
+    .integer("created_at", { mode: "timestamp" })
+    .$defaultFn(() => new Date())
+    .notNull(),
+});
+
+export const monstersTable = sql.sqliteTable("monsters", {
+  id: sql.integer("id").primaryKey(),
+  name: sql.text("name").notNull(),
+  level: sql.integer("level").notNull(),
+  description: sql.text("description").notNull(),
+  health: sql.integer("health").notNull(),
+  stats: sql.text("stats").notNull(), // JSON string for monster stats
+  imageUrl: sql.text("image_url"),
   createdAt: sql.integer("created_at", { mode: "timestamp" }).$defaultFn(() => new Date()),
 });
 
@@ -120,3 +142,14 @@ export const patchInventorySchema = insertInventorySchema.partial();
 export const selectQuestsSchema = createSelectSchema(questsTable);
 export const insertQuestsSchema = createInsertSchema(questsTable);
 export const patchQuestsSchema = insertQuestsSchema.partial();
+
+export const selectMonstersSchema = createSelectSchema(monstersTable);
+export const insertMonstersSchema = createInsertSchema(monstersTable, {
+  name: (s) => s.nonempty().min(1).max(50),
+  level: (s) => s.min(1),
+  description: (s) => s.nonempty(),
+}).omit({
+  id: true,
+  createdAt: true,
+});
+export const patchMonstersSchema = insertMonstersSchema.partial();
