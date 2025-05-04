@@ -175,6 +175,34 @@ export class HeroService {
   }
 
   /**
+   * Rend un héros actif, le désactivant les autres
+   * @param heroId ID du héros à rendre actif
+   * @param userId ID de l'utilisateur propriétaire
+   * @returns Le héros mis à jour avec les stats parsées ou null si non trouvé
+   */
+  static async activateHero(heroId: number, userId: number): Promise<ParsedHero | null> {
+    const heroExists = await this.getHeroById(heroId, userId);
+    if (!heroExists) return null;
+
+    // Désactiver tous les autres héros de l'utilisateur
+    await db
+      .update(heroesTable)
+      .set({ isActive: false })
+      .where(and(eq(heroesTable.userId, userId), eq(heroesTable.isActive, true)))
+      .execute();
+
+    // Activer le héros spécifié
+    const [updatedHero] = await db
+      .update(heroesTable)
+      .set({ isActive: true })
+      .where(and(eq(heroesTable.userId, userId), eq(heroesTable.id, heroId)))
+      .returning()
+      .execute();
+
+    return this.parseHeroStats(updatedHero as HeroDb);
+  }
+
+  /**
    * Met à jour les statistiques d'un héros
    * @param heroId ID du héros à modifier
    * @param userId ID de l'utilisateur propriétaire

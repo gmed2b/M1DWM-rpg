@@ -103,6 +103,26 @@ heroesController.delete("/:id", zValidator("param", heroIdParamSchema), async (c
   return c.json({ message: "Hero deleted successfully" }, 200);
 });
 
+heroesController.put("/:id/activate", zValidator("param", heroIdParamSchema), async (c) => {
+  const payload = c.get("jwtPayload");
+  const userId = payload.id;
+
+  const { id } = (await c.req.valid("param")) as HeroIdParam;
+  const hero = await HeroService.activateHero(Number(id), userId);
+
+  if (!hero) {
+    return c.json({ message: "Hero not found" }, 404);
+  }
+
+  return c.json(
+    {
+      message: "Hero activated successfully",
+      hero: hero,
+    },
+    200
+  );
+});
+
 heroesController.get("/:id/stats", zValidator("param", heroIdParamSchema), async (c) => {
   const payload = c.get("jwtPayload");
   const userId = payload.id;
