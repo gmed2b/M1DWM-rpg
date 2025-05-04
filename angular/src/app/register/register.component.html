@@ -3,7 +3,15 @@
     <h1 class="!text-2xl text-center">Création d'Aventurier</h1>
     <hr class="golden mb-8" />
 
-    <!-- Error message -->
+    <!-- Message de succès -->
+    <div
+      *ngIf="registerSuccess"
+      class="mb-4 p-3 rpgui-container framed-grey-sm text-green-500 text-center"
+    >
+      {{ registerSuccess }}
+    </div>
+
+    <!-- Message d'erreur -->
     <div
       *ngIf="registerError"
       class="mb-4 p-3 rpgui-container framed-grey-sm text-red-500 text-center"
@@ -49,7 +57,7 @@
         >
           <div *ngIf="password.errors?.['required']">Mot de passe requis</div>
           <div *ngIf="password.errors?.['minlength']">
-            Le mot de passe doit contenir au moins 6 caractères
+            Le mot de passe doit contenir au moins 2 caractères
           </div>
         </div>
       </div>
@@ -86,9 +94,10 @@
         <button
           type="submit"
           class="rpgui-button golden"
-          [disabled]="registerForm.invalid"
+          [disabled]="registerForm.invalid || isLoading"
         >
-          <p>CRÉER MON AVENTURIER</p>
+          <p *ngIf="!isLoading">CRÉER MON AVENTURIER</p>
+          <p *ngIf="isLoading">CRÉATION EN COURS...</p>
         </button>
       </div>
     </form>

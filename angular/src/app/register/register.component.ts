@@ -8,7 +8,7 @@ import {
   ValidationErrors,
   Validators,
 } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../auth/auth.service';
 
 @Component({
@@ -20,11 +20,17 @@ import { AuthService } from '../auth/auth.service';
 export class RegisterComponent implements OnInit {
   registerForm: FormGroup;
   registerError: string | null = null;
+  registerSuccess: string | null = null;
+  isLoading: boolean = false;
 
-  constructor(private fb: FormBuilder, private authService: AuthService) {
+  constructor(
+    private fb: FormBuilder,
+    private authService: AuthService,
+    private router: Router
+  ) {
     this.registerForm = this.fb.group(
       {
-        username: ['', [Validators.required]],
+        username: ['', [Validators.required, Validators.minLength(3)]],
         password: ['', [Validators.required, Validators.minLength(2)]],
         confirmPassword: ['', [Validators.required]],
       },
@@ -61,6 +67,9 @@ export class RegisterComponent implements OnInit {
   onSubmit(): void {
     if (this.registerForm.valid) {
       this.registerError = null;
+      this.registerSuccess = null;
+      this.isLoading = true;
+
       this.authService
         .register({
           username: this.registerForm.value.username,
@@ -69,18 +78,39 @@ export class RegisterComponent implements OnInit {
         })
         .subscribe({
           next: () => {
-            // Navigation is handled in authService
+            this.isLoading = false;
+            this.registerSuccess =
+              'Inscription réussie ! Vous allez être redirigé...';
             console.log('Registration successful');
+
+            // Réinitialiser le formulaire
+            this.registerForm.reset();
+
+            // Redirection automatique après 2 secondes
+            setTimeout(() => {
+              this.registerSuccess = null;
+              this.router.navigate(['/login']);
+            }, 2000);
           },
           error: (err) => {
+            this.isLoading = false;
             console.error('Registration failed:', err);
-            this.registerError =
-              "Erreur lors de l'inscription. Veuillez réessayer.";
+
+            // Messages d'erreur plus spécifiques selon le type d'erreur
+            if (err.status === 401) {
+              this.registerError =
+                "Ce nom d'aventurier est déjà pris. Veuillez en choisir un autre.";
+            } else {
+              this.registerError =
+                "Erreur lors de l'inscription. Veuillez réessayer.";
+            }
           },
         });
     } else {
       // Marquer tous les champs comme touchés pour afficher les erreurs
       this.markFormGroupTouched(this.registerForm);
+      this.registerError =
+        'Veuillez corriger les erreurs dans le formulaire avant de continuer.';
     }
   }
 
