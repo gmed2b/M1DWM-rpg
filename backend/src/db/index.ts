@@ -1,14 +1,6 @@
 import "dotenv/config";
-import { drizzle } from "drizzle-orm/libsql";
-import * as schema from "./schema";
+import { drizzle } from "drizzle-orm/bun-sqlite";
 
-const db = drizzle({
-  connection: {
-    url: process.env.DATABASE_URL!,
-    authToken: process.env.DATABASE_AUTH_TOKEN!,
-  },
-  casing: "snake_case",
-  schema,
-});
+const db = drizzle(process.env.DATABASE_URL!);
 
 export default db;
