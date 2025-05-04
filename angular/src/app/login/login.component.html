@@ -12,6 +12,14 @@
     </div>
     -->
 
+    <!-- Error message -->
+    <div
+      *ngIf="loginError"
+      class="mb-4 p-3 rpgui-container framed-grey-sm text-red-500 text-center"
+    >
+      {{ loginError }}
+    </div>
+
     <!-- Formulaire de connexion -->
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
       <div class="mb-6">
@@ -64,7 +72,7 @@
     <!-- Pas encore de compte -->
     <div class="text-center">
       <p class="mb-4">Pas encore de compte?</p>
-      <a href="/register" class="rpgui-button golden">
+      <a [routerLink]="['/register']" class="rpgui-button golden">
         <p>CRÉER UN COMPTE</p>
       </a>
     </div>

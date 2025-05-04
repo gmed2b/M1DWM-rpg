@@ -1,4 +1,10 @@
-<main class="rpgui-content !p-10">
-  <app-navbar></app-navbar>
+<main
+  class="rpgui-content"
+  [ngClass]="{
+    '!p-10': authService.isLoggedIn(),
+    'p-0': !authService.isLoggedIn()
+  }"
+>
+  <app-navbar *ngIf="authService.isLoggedIn()"></app-navbar>
   <router-outlet></router-outlet>
 </main>

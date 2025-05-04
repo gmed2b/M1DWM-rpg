@@ -1,22 +1,17 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../auth/auth.service';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.css',
 })
 export class NavbarComponent {
-  isLoggedIn: boolean;
-  username: string = 'Medjourney';
-
-  constructor(private router: Router, private authService: AuthService) {
-    this.isLoggedIn = this.authService.isLoggedIn();
-  }
+  constructor(private router: Router, public authService: AuthService) {}
 
   onHome() {
     this.router.navigate(['/']);

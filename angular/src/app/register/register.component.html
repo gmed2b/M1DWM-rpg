@@ -3,6 +3,14 @@
     <h1 class="!text-2xl text-center">Création d'Aventurier</h1>
     <hr class="golden mb-8" />
 
+    <!-- Error message -->
+    <div
+      *ngIf="registerError"
+      class="mb-4 p-3 rpgui-container framed-grey-sm text-red-500 text-center"
+    >
+      {{ registerError }}
+    </div>
+
     <!-- Formulaire d'inscription -->
     <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
       <!-- Informations de base -->
@@ -87,10 +95,18 @@
 
     <!-- Information complémentaire -->
     <div class="text-center mt-6">
-      <p class="text-sm">
+      <p class="text-sm mb-4">
         En créant un compte, vous pourrez sauvegarder votre progression,
         rejoindre des guildes et participer aux événements saisonniers.
       </p>
+    </div>
+
+    <div class="flex flex-col items-center">
+      <hr class="golden mb-2 w-full" />
+      <p>Déjà un compte?</p>
+      <a [routerLink]="['/login']" class="rpgui-button">
+        <p>CONNEXION</p>
+      </a>
     </div>
   </div>
 </main>

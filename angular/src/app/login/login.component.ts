@@ -6,18 +6,20 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { Router } from '@angular/router';
+import { RouterModule } from '@angular/router';
+import { AuthService } from '../auth/auth.service';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule],
 })
 export class LoginComponent implements OnInit {
   loginForm: FormGroup;
+  loginError: string | null = null;
 
-  constructor(private fb: FormBuilder, private router: Router) {
+  constructor(private fb: FormBuilder, private authService: AuthService) {
     this.loginForm = this.fb.group({
       username: ['', Validators.required],
       password: ['', Validators.required],
@@ -35,12 +37,17 @@ export class LoginComponent implements OnInit {
 
   onSubmit(): void {
     if (this.loginForm.valid) {
-      console.log('Formulaire soumis:', this.loginForm.value);
-      // Normalement ici tu aurais ton service d'authentification
-      // AuthService.login(this.username.value, this.password.value)
-
-      // Redirection vers le tableau de bord après connexion
-      this.router.navigate(['/dashboard']);
+      this.loginError = null;
+      this.authService.login(this.loginForm.value).subscribe({
+        next: () => {
+          // Navigation is handled in authService
+          console.log('Login successful');
+        },
+        error: (err) => {
+          console.error('Login failed:', err);
+          this.loginError = 'Identifiants incorrects. Veuillez réessayer.';
+        },
+      });
     }
   }
 }

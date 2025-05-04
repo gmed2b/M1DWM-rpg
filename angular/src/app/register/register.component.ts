@@ -8,18 +8,20 @@ import {
   ValidationErrors,
   Validators,
 } from '@angular/forms';
-import { Router } from '@angular/router';
+import { RouterModule } from '@angular/router';
+import { AuthService } from '../auth/auth.service';
 
 @Component({
   selector: 'app-register',
   templateUrl: './register.component.html',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule],
 })
 export class RegisterComponent implements OnInit {
   registerForm: FormGroup;
+  registerError: string | null = null;
 
-  constructor(private fb: FormBuilder, private router: Router) {
+  constructor(private fb: FormBuilder, private authService: AuthService) {
     this.registerForm = this.fb.group(
       {
         username: ['', [Validators.required, Validators.minLength(3)]],
@@ -58,12 +60,24 @@ export class RegisterComponent implements OnInit {
 
   onSubmit(): void {
     if (this.registerForm.valid) {
-      console.log('Inscription soumise:', this.registerForm.value);
-      // Ici, tu implémenteras l'appel à ton service d'authentification pour créer un compte
-      // AuthService.register(this.registerForm.value)
-
-      // Redirection vers le tableau de bord ou la page de confirmation
-      this.router.navigate(['/dashboard']);
+      this.registerError = null;
+      this.authService
+        .register({
+          username: this.registerForm.value.username,
+          password: this.registerForm.value.password,
+          confirmPassword: this.registerForm.value.confirmPassword,
+        })
+        .subscribe({
+          next: () => {
+            // Navigation is handled in authService
+            console.log('Registration successful');
+          },
+          error: (err) => {
+            console.error('Registration failed:', err);
+            this.registerError =
+              "Erreur lors de l'inscription. Veuillez réessayer.";
+          },
+        });
     } else {
       // Marquer tous les champs comme touchés pour afficher les erreurs
       this.markFormGroupTouched(this.registerForm);
