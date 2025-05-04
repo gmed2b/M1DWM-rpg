@@ -20,6 +20,7 @@ interface RaceOption {
   value: string;
   label: string;
   description: string;
+  icon: string;
 }
 
 @Component({
@@ -44,13 +45,13 @@ export class CreateHeroComponent implements OnInit {
       label: 'Guerrier',
       description:
         'Spécialiste du combat au corps à corps avec une grande force.',
-      icon: 'sword',
+      icon: 'sword-2',
     },
     {
       value: 'mage',
       label: 'Mage',
       description: 'Manipule les arcanes pour lancer des sorts puissants.',
-      icon: 'magic-wand',
+      icon: 'wand',
     },
     {
       value: 'ranger',
@@ -78,21 +79,25 @@ export class CreateHeroComponent implements OnInit {
       value: 'human',
       label: 'Humain',
       description: 'Polyvalent et adaptable à toutes les situations.',
+      icon: 'wand',
     },
     {
       value: 'elf',
       label: 'Elfe',
       description: "Gracieux et doué pour la magie et l'archerie.",
+      icon: 'wand',
     },
     {
-      value: 'dwarf',
-      label: 'Nain',
+      value: 'demon',
+      label: 'Démon',
       description: 'Robuste et résistant, expert en combat et artisanat.',
+      icon: 'wand',
     },
     {
       value: 'orc',
       label: 'Orc',
       description: 'Fort et endurant, spécialiste du combat brutal.',
+      icon: 'wand',
     },
   ];
 
@@ -113,30 +118,30 @@ export class CreateHeroComponent implements OnInit {
           Validators.maxLength(20),
         ],
       ],
-      race: ['', [Validators.required]],
-      class_type: ['', [Validators.required]],
+      race: ['human', [Validators.required]],
+      class_type: ['warrior', [Validators.required]],
       stats: this.fb.group({
         strength: [
-          5,
+          1,
           [Validators.required, Validators.min(1), Validators.max(20)],
         ],
         magic: [
-          5,
+          1,
           [Validators.required, Validators.min(1), Validators.max(20)],
         ],
         agility: [
-          5,
+          1,
           [Validators.required, Validators.min(1), Validators.max(20)],
         ],
         speed: [
-          5,
+          1,
           [Validators.required, Validators.min(1), Validators.max(20)],
         ],
         charisma: [
-          5,
+          1,
           [Validators.required, Validators.min(1), Validators.max(20)],
         ],
-        luck: [5, [Validators.required, Validators.min(1), Validators.max(20)]],
+        luck: [1, [Validators.required, Validators.min(1), Validators.max(20)]],
       }),
     });
   }

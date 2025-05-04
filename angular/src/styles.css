@@ -20,18 +20,18 @@ body {
   @apply py-3;
 }
 
+.rpgui-icon.sword-2 {
+  background-image: url("assets/icons/sword-2.png");
+}
 .rpgui-icon.bow {
   background-image: url("assets/icons/bow.png");
 }
 .rpgui-icon.coin-bag {
   background-image: url("assets/icons/coin-bag.png");
 }
-.rpgui-icon.magic-wand {
-  background-image: url("assets/icons/magic-wand.png");
+.rpgui-icon.wand {
+  background-image: url("assets/icons/wand.png");
 }
 .rpgui-icon.potion {
   background-image: url("assets/icons/potion.png");
-}
-.rpgui-icon.house {
-  background-image: url("assets/icons/house.png");
 }
