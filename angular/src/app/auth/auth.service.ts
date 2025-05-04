@@ -1,85 +1,77 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable, signal } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { tap } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
+
+interface User {
+  id: number;
+  username: string;
+  avatar?: string;
+  createdAt: string;
+}
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  private authUrl = 'http://localhost:9000/auth/login';
-  // Make this private so we control updates through methods
-  private readonly _isLoggedIn = signal(this.hasToken());
-  private user: any = {};
+  private apiUrl = 'http://localhost:9000/api/auth';
+  private currentUserSubject = new BehaviorSubject<User | null>(null);
+  public currentUser$ = this.currentUserSubject.asObservable();
 
-  constructor(private http: HttpClient, private router: Router) {}
-
-  // Public accessor for the logged in state
-  isLoggedIn(): boolean {
-    return this._isLoggedIn();
-  }
-
-  // Public accessor for the user object
-  getUser(): any {
-    const user = localStorage.getItem('user');
-    if (user) {
-      this.user = JSON.parse(user);
+  constructor(private http: HttpClient, private router: Router) {
+    // Vérifier si l'utilisateur est déjà connecté au chargement du service
+    const userData = localStorage.getItem('user');
+    if (userData) {
+      this.currentUserSubject.next(JSON.parse(userData));
     }
-    return this.user;
-  }
-  // Public method to update the user object
-  updateUser(user: any) {
-    this.user = user;
-    localStorage.setItem('user', JSON.stringify(user));
   }
 
-  register(credentials: {
+  login(credentials: { username: string; password: string }): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/login`, credentials).pipe(
+      tap((response) => {
+        if (response && response.accessToken) {
+          localStorage.setItem('token', response.accessToken);
+          localStorage.setItem('user', JSON.stringify(response.user));
+          this.currentUserSubject.next(response.user);
+          // Rediriger vers le dashboard après une connexion réussie
+          this.router.navigate(['/dashboard']);
+        }
+      })
+    );
+  }
+
+  register(userData: {
     username: string;
     password: string;
     confirmPassword: string;
-  }) {
-    return this.http
-      .post('http://localhost:9000/auth/register', credentials)
-      .pipe(
-        tap(() => {
-          // Navigate to login after successful registration
-          this.router.navigate(['/login']);
-        })
-      );
+  }): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/register`, userData);
   }
 
-  login(credentials: { username: string; password: string }) {
-    return this.http
-      .post<{ accessToken: string; refreshToken: string; user: any }>(
-        this.authUrl,
-        credentials
-      )
-      .pipe(
-        tap((response) => {
-          localStorage.setItem('access_token', response.accessToken);
-          localStorage.setItem('refresh_token', response.refreshToken);
-          this.updateUser(response.user);
-          this._isLoggedIn.set(true);
-          // Navigate to dashboard after successful login
-          this.router.navigate(['/dashboard']);
-        })
-      );
-  }
-
-  logout() {
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('refresh_token');
+  logout(): void {
+    localStorage.removeItem('token');
     localStorage.removeItem('user');
-    this._isLoggedIn.set(false);
-    // Navigate to login page after logout
-    this.router.navigate(['/login']);
+    this.currentUserSubject.next(null);
   }
 
-  getAccessToken(): string | null {
-    return localStorage.getItem('access_token');
+  getProfile(): Observable<User> {
+    return this.http.get<User>(`${this.apiUrl}/profile`);
   }
 
-  hasToken(): boolean {
-    return !!this.getAccessToken();
+  get currentUserValue(): User | null {
+    return this.currentUserSubject.value;
+  }
+
+  get isLoggedIn(): boolean {
+    return !!this.currentUserValue;
+  }
+
+  getUser(): User | null {
+    return this.currentUserValue;
+  }
+
+  get token(): string | null {
+    return localStorage.getItem('token');
   }
 }

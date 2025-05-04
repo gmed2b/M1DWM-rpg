@@ -6,7 +6,9 @@
   </div>
   <div class="flex items-center gap-6">
     <a class="rpgui-button golden" (click)="onProfile()">
-      <p class="text-center">{{ authService.getUser().username }}</p>
+      <p class="text-center">
+        {{ authService.getUser()?.username || "Utilisateur" }}
+      </p>
     </a>
     <button class="rpgui-button" type="button" (click)="onLogout()">
       <p>Déconnexion</p>

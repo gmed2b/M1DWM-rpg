@@ -1,6 +1,7 @@
 import { zValidator } from "@hono/zod-validator";
 import "dotenv/config";
 import { Hono } from "hono";
+import { jwt } from "hono/jwt";
 import { z } from "zod";
 import { AuthService } from "../services/auth.service";
 
@@ -74,5 +75,24 @@ authController.post(
     return c.json(result, 200);
   }
 );
+
+authController.use("/profile", jwt({ secret: process.env.ACCESS_TOKEN_SECRET! }));
+
+authController.get("/profile", async (c) => {
+  const payload = c.get("jwtPayload");
+
+  const user = await AuthService.getUserById(payload.id);
+
+  if (!user) {
+    return c.json(
+      {
+        message: "User not found",
+      },
+      404
+    );
+  }
+
+  return c.json(user, 200);
+});
 
 export default authController;

@@ -1,0 +1,364 @@
+<main class="rpgui-container framed">
+  <h1 class="!text-2xl">Création de Personnage</h1>
+  <hr class="golden mb-8" />
+
+  <!-- Message d'erreur -->
+  <div
+    *ngIf="createError"
+    class="rpgui-container framed-grey p-4 mb-4 text-red-500 text-center"
+  >
+    {{ createError }}
+  </div>
+
+  <form [formGroup]="heroForm" (ngSubmit)="onSubmit()" class="space-y-6">
+    <!-- Informations de base -->
+    <div class="rpgui-container framed-golden p-4">
+      <h2>Identité</h2>
+      <hr class="golden" />
+
+      <div class="mb-4">
+        <label class="block mb-2">Nom du personnage</label>
+        <input
+          type="text"
+          formControlName="name"
+          class="rpgui-input mb-1 w-full"
+          placeholder="Entrez le nom de votre personnage"
+        />
+        <div
+          *ngIf="name?.invalid && (name?.dirty || name?.touched)"
+          class="text-red-400 text-sm"
+        >
+          <div *ngIf="name?.errors?.['required']">Le nom est requis</div>
+          <div *ngIf="name?.errors?.['minlength']">
+            Le nom doit contenir au moins 3 caractères
+          </div>
+          <div *ngIf="name?.errors?.['maxlength']">
+            Le nom ne peut pas dépasser 20 caractères
+          </div>
+        </div>
+      </div>
+
+      <!-- Race -->
+      <div class="mb-4">
+        <label class="block mb-2">Race</label>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div *ngFor="let raceOption of raceOptions">
+            <label
+              class="rpgui-container framed-grey-sm p-3 cursor-pointer"
+              [class.rpgui-container-framed-golden-sm]="
+                race?.value === raceOption.value
+              "
+            >
+              <input
+                type="radio"
+                [value]="raceOption.value"
+                formControlName="race"
+                class="opacity-0 absolute"
+              />
+              <div class="flex flex-col items-center">
+                <h3 class="mb-1">{{ raceOption.label }}</h3>
+                <p class="text-xs text-center">{{ raceOption.description }}</p>
+              </div>
+            </label>
+          </div>
+        </div>
+        <div
+          *ngIf="race?.invalid && (race?.dirty || race?.touched)"
+          class="text-red-400 text-sm mt-1"
+        >
+          <div *ngIf="race?.errors?.['required']">
+            Veuillez choisir une race
+          </div>
+        </div>
+      </div>
+
+      <!-- Classe -->
+      <div class="mb-4">
+        <label class="block mb-2">Classe</label>
+        <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-3">
+          <div *ngFor="let classOption of classOptions">
+            <label
+              class="rpgui-container framed-grey-sm p-3 cursor-pointer"
+              [class.rpgui-container-framed-golden-sm]="
+                class_type?.value === classOption.value
+              "
+            >
+              <input
+                type="radio"
+                [value]="classOption.value"
+                formControlName="class_type"
+                class="opacity-0 absolute"
+              />
+              <div class="flex flex-col items-center text-center">
+                <div class="rpgui-icon {{ classOption.icon }} mb-2"></div>
+                <h3 class="mb-1">{{ classOption.label }}</h3>
+                <p class="text-xs">{{ classOption.description }}</p>
+              </div>
+            </label>
+          </div>
+        </div>
+        <div
+          *ngIf="
+            class_type?.invalid && (class_type?.dirty || class_type?.touched)
+          "
+          class="text-red-400 text-sm mt-1"
+        >
+          <div *ngIf="class_type?.errors?.['required']">
+            Veuillez choisir une classe
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Statistiques -->
+    <div class="rpgui-container framed-golden p-4">
+      <div class="flex justify-between items-center mb-2">
+        <h2>Statistiques</h2>
+        <div>
+          Points restants:
+          <span
+            [class.text-red-500]="availablePoints < 0"
+            [class.text-yellow-400]="availablePoints >= 0"
+            class="rpgui-text-shadow"
+          >
+            {{ availablePoints }}
+          </span>
+        </div>
+      </div>
+      <hr class="golden" />
+
+      <div formGroupName="stats" class="space-y-4 mt-4">
+        <!-- Force -->
+        <div class="rpgui-container framed-grey-sm p-3">
+          <div class="flex justify-between items-center">
+            <div>
+              <span class="text-white font-semibold">Force</span>
+              <p class="text-xs mt-1">
+                Affecte les dégâts physiques et la capacité à porter des objets
+                lourds
+              </p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button
+                type="button"
+                class="rpgui-button px-2 py-1"
+                (click)="decrementStat('strength')"
+                [disabled]="stats.get('strength')?.value <= 1"
+              >
+                -
+              </button>
+              <span class="rpgui-text-shadow text-yellow-400 w-6 text-center">{{
+                stats.get("strength")?.value
+              }}</span>
+              <button
+                type="button"
+                class="rpgui-button px-2 py-1"
+                (click)="incrementStat('strength')"
+                [disabled]="
+                  availablePoints <= 0 || stats.get('strength')?.value >= 20
+                "
+              >
+                +
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Magie -->
+        <div class="rpgui-container framed-grey-sm p-3">
+          <div class="flex justify-between items-center">
+            <div>
+              <span class="text-white font-semibold">Magie</span>
+              <p class="text-xs mt-1">
+                Détermine la puissance des sorts et la résistance magique
+              </p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button
+                type="button"
+                class="rpgui-button px-2 py-1"
+                (click)="decrementStat('magic')"
+                [disabled]="stats.get('magic')?.value <= 1"
+              >
+                -
+              </button>
+              <span class="rpgui-text-shadow text-yellow-400 w-6 text-center">{{
+                stats.get("magic")?.value
+              }}</span>
+              <button
+                type="button"
+                class="rpgui-button px-2 py-1"
+                (click)="incrementStat('magic')"
+                [disabled]="
+                  availablePoints <= 0 || stats.get('magic')?.value >= 20
+                "
+              >
+                +
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Agilité -->
+        <div class="rpgui-container framed-grey-sm p-3">
+          <div class="flex justify-between items-center">
+            <div>
+              <span class="text-white font-semibold">Agilité</span>
+              <p class="text-xs mt-1">
+                Améliore la précision des attaques et l'esquive
+              </p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button
+                type="button"
+                class="rpgui-button px-2 py-1"
+                (click)="decrementStat('agility')"
+                [disabled]="stats.get('agility')?.value <= 1"
+              >
+                -
+              </button>
+              <span class="rpgui-text-shadow text-yellow-400 w-6 text-center">{{
+                stats.get("agility")?.value
+              }}</span>
+              <button
+                type="button"
+                class="rpgui-button px-2 py-1"
+                (click)="incrementStat('agility')"
+                [disabled]="
+                  availablePoints <= 0 || stats.get('agility')?.value >= 20
+                "
+              >
+                +
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Vitesse -->
+        <div class="rpgui-container framed-grey-sm p-3">
+          <div class="flex justify-between items-center">
+            <div>
+              <span class="text-white font-semibold">Vitesse</span>
+              <p class="text-xs mt-1">
+                Détermine l'ordre d'attaque et la capacité à se déplacer
+              </p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button
+                type="button"
+                class="rpgui-button px-2 py-1"
+                (click)="decrementStat('speed')"
+                [disabled]="stats.get('speed')?.value <= 1"
+              >
+                -
+              </button>
+              <span class="rpgui-text-shadow text-yellow-400 w-6 text-center">{{
+                stats.get("speed")?.value
+              }}</span>
+              <button
+                type="button"
+                class="rpgui-button px-2 py-1"
+                (click)="incrementStat('speed')"
+                [disabled]="
+                  availablePoints <= 0 || stats.get('speed')?.value >= 20
+                "
+              >
+                +
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Charisme -->
+        <div class="rpgui-container framed-grey-sm p-3">
+          <div class="flex justify-between items-center">
+            <div>
+              <span class="text-white font-semibold">Charisme</span>
+              <p class="text-xs mt-1">
+                Influence les prix des marchands et les interactions sociales
+              </p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button
+                type="button"
+                class="rpgui-button px-2 py-1"
+                (click)="decrementStat('charisma')"
+                [disabled]="stats.get('charisma')?.value <= 1"
+              >
+                -
+              </button>
+              <span class="rpgui-text-shadow text-yellow-400 w-6 text-center">{{
+                stats.get("charisma")?.value
+              }}</span>
+              <button
+                type="button"
+                class="rpgui-button px-2 py-1"
+                (click)="incrementStat('charisma')"
+                [disabled]="
+                  availablePoints <= 0 || stats.get('charisma')?.value >= 20
+                "
+              >
+                +
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chance -->
+        <div class="rpgui-container framed-grey-sm p-3">
+          <div class="flex justify-between items-center">
+            <div>
+              <span class="text-white font-semibold">Chance</span>
+              <p class="text-xs mt-1">
+                Augmente les chances de coups critiques et de trouver des objets
+                rares
+              </p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button
+                type="button"
+                class="rpgui-button px-2 py-1"
+                (click)="decrementStat('luck')"
+                [disabled]="stats.get('luck')?.value <= 1"
+              >
+                -
+              </button>
+              <span class="rpgui-text-shadow text-yellow-400 w-6 text-center">{{
+                stats.get("luck")?.value
+              }}</span>
+              <button
+                type="button"
+                class="rpgui-button px-2 py-1"
+                (click)="incrementStat('luck')"
+                [disabled]="
+                  availablePoints <= 0 || stats.get('luck')?.value >= 20
+                "
+              >
+                +
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Message d'erreur si trop de points utilisés -->
+      <div *ngIf="availablePoints < 0" class="text-red-500 mt-4 text-center">
+        Vous avez utilisé trop de points! Réduisez certaines statistiques.
+      </div>
+    </div>
+
+    <!-- Boutons d'action -->
+    <div class="flex gap-4 justify-center mt-6">
+      <button type="button" class="rpgui-button" (click)="onCancel()">
+        <p>ANNULER</p>
+      </button>
+      <button
+        type="submit"
+        class="rpgui-button golden"
+        [disabled]="heroForm.invalid || availablePoints < 0 || loading"
+      >
+        <p>{{ loading ? "CRÉATION..." : "CRÉER" }}</p>
+      </button>
+    </div>
+  </form>
+</main>

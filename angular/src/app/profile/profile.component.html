@@ -2,13 +2,25 @@
   <h1 class="!text-2xl">Profil d'Aventurier</h1>
   <hr class="golden mb-8" />
 
+  <!-- Message d'erreur -->
+  <div
+    *ngIf="error"
+    class="rpgui-container framed-grey p-4 mb-4 text-red-500 text-center"
+  >
+    {{ error }}
+  </div>
+
   <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-8">
     <!-- SECTION 1: INFORMATIONS DE COMPTE -->
     <section class="rpgui-container framed-golden">
       <h2>Compte</h2>
       <hr />
 
-      <div class="flex flex-col items-center mb-6">
+      <div *ngIf="loading" class="p-4 text-center">
+        <p>Chargement des informations...</p>
+      </div>
+
+      <div *ngIf="!loading" class="flex flex-col items-center mb-6">
         <!-- Avatar -->
         <div
           class="rpgui-icon empty-slot mb-4"
@@ -30,25 +42,21 @@
 
         <!-- Nom d'utilisateur -->
         <h3 class="!text-xl mb-2">{{ user?.username || "Aventurier" }}</h3>
-        <span class="text-sm"
-          >Membre depuis {{ user?.joinDate | date : "dd/MM/yyyy" }}</span
-        >
+        <span class="text-sm">
+          Membre depuis {{ user?.createdAt | date : "dd/MM/yyyy" }}
+        </span>
       </div>
 
       <!-- Statistiques du compte -->
-      <div class="mb-6">
+      <div *ngIf="!loading" class="mb-6">
         <div class="flex justify-between mb-2">
           <span>Personnages:</span>
           <span>{{ characters.length || 0 }}</span>
         </div>
-        <div class="flex justify-between mb-2">
-          <span>Dernière connexion:</span>
-          <span>{{ user?.lastLogin | date : "dd/MM/yyyy" }}</span>
-        </div>
       </div>
 
       <!-- Boutons d'action -->
-      <div class="flex gap-2 mt-4">
+      <div *ngIf="!loading" class="flex gap-2 mt-4">
         <button class="rpgui-button" type="button">
           <p>MODIFIER L'AVATAR</p>
         </button>
@@ -63,42 +71,56 @@
       <h2>Statistiques de Jeu</h2>
       <hr class="golden" />
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+      <div *ngIf="loading" class="p-4 text-center">
+        <p>Chargement des statistiques...</p>
+      </div>
+
+      <div
+        *ngIf="!loading && characters.length > 0"
+        class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4"
+      >
         <div
           class="rpgui-container framed-grey-sm flex flex-col items-center p-4"
         >
-          <h3>Quêtes complétées</h3>
-          <span class="rpgui-text-shadow text-2xl">{{
-            user?.stats?.completedQuests || 0
-          }}</span>
+          <h3>Niveau max</h3>
+          <span class="rpgui-text-shadow text-2xl">
+            {{ getMaxLevel() }}
+          </span>
         </div>
 
         <div
           class="rpgui-container framed-grey-sm flex flex-col items-center p-4"
         >
-          <h3>Combats gagnés</h3>
-          <span class="rpgui-text-shadow text-2xl">{{
-            user?.stats?.victories || 0
-          }}</span>
+          <h3>Personnages</h3>
+          <span class="rpgui-text-shadow text-2xl">
+            {{ characters.length }}
+          </span>
         </div>
 
         <div
           class="rpgui-container framed-grey-sm flex flex-col items-center p-4"
         >
           <h3>Or total</h3>
-          <span class="rpgui-text-shadow text-2xl text-yellow-400">{{
-            user?.stats?.totalGold || 0
-          }}</span>
+          <span class="rpgui-text-shadow text-2xl text-yellow-400">
+            {{ getTotalGold() }}
+          </span>
         </div>
 
         <div
           class="rpgui-container framed-grey-sm flex flex-col items-center p-4"
         >
           <h3>Temps de jeu</h3>
-          <span class="rpgui-text-shadow text-2xl">{{
-            formatPlayTime(user?.stats?.playTime)
-          }}</span>
+          <span class="rpgui-text-shadow text-2xl">
+            {{ formatPlayTime(0) }}
+          </span>
         </div>
+      </div>
+
+      <div *ngIf="!loading && characters.length === 0" class="p-4 text-center">
+        <p>
+          Aucune statistique disponible. Créez un personnage pour commencer
+          votre aventure!
+        </p>
       </div>
     </section>
   </div>
@@ -113,8 +135,12 @@
     </div>
     <hr />
 
+    <div *ngIf="loading" class="p-4 text-center">
+      <p>Chargement des personnages...</p>
+    </div>
+
     <div
-      *ngIf="characters && characters.length > 0; else noCharacters"
+      *ngIf="!loading && characters.length > 0"
       class="max-h-96 overflow-y-auto"
     >
       <table class="rpgui-container framed w-full mb-4">
@@ -137,9 +163,9 @@
             </td>
             <td class="p-2 flex items-center">
               <div
-                class="rpgui-icon {{ getClassIcon(character.class) }} mr-2"
+                class="rpgui-icon {{ getClassIcon(character.classType) }} mr-2"
               ></div>
-              {{ character.class }}
+              {{ character.classType }}
             </td>
             <td class="p-2 text-center">{{ character.level }}</td>
             <td class="p-2 text-center">
@@ -179,5 +205,18 @@
         </button>
       </div>
     </ng-template>
+
+    <div *ngIf="!loading && characters.length === 0">
+      <div class="rpgui-container framed-grey p-6 text-center">
+        <p class="mb-4">Vous n'avez pas encore de personnage.</p>
+        <button
+          class="rpgui-button golden"
+          type="button"
+          (click)="onCreateCharacter()"
+        >
+          <p>CRÉER MON PREMIER PERSONNAGE</p>
+        </button>
+      </div>
+    </div>
   </section>
 </main>
