@@ -1,0 +1,111 @@
+<section class="rpgui-container framed-golden">
+  <h2>Personnage Actif</h2>
+  <hr class="golden" />
+
+  <div *ngIf="loading" class="p-4 text-center">
+    <p>Chargement du personnage actif...</p>
+  </div>
+
+  <div
+    *ngIf="error"
+    class="rpgui-container framed-grey p-4 text-red-500 text-center"
+  >
+    {{ error }}
+  </div>
+
+  <div *ngIf="!loading && !activeHero" class="p-4 text-center">
+    <p>Vous n'avez pas de personnage actif.</p>
+    <button class="rpgui-button golden mt-4" routerLink="/create-hero">
+      <p>CRÉER UN PERSONNAGE</p>
+    </button>
+  </div>
+
+  <div *ngIf="!loading && activeHero" class="flex flex-col">
+    <!-- En-tête du héros -->
+    <div class="flex items-center mb-4">
+      <div
+        class="rpgui-icon {{ getClassIcon(activeHero.classType) }} mr-3"
+      ></div>
+      <div>
+        <h3 class="!text-xl mb-1">{{ activeHero.name }}</h3>
+        <div class="flex items-center gap-2">
+          <span class="text-sm">Niveau {{ activeHero.level }}</span>
+          <span class="text-xs"
+            >{{ activeHero.race }} {{ activeHero.classType }}</span
+          >
+        </div>
+      </div>
+    </div>
+
+    <!-- Santé et expérience -->
+    <div class="mb-4">
+      <div class="flex justify-between items-center text-sm mb-1">
+        <span>Santé</span>
+        <span>{{ activeHero.health }}/100</span>
+      </div>
+      <div class="rpgui-progress red" data-rpguitype="progress">
+        <div class="rpgui-progress-track">
+          <div
+            class="rpgui-progress-fill"
+            [style.width]="activeHero.health + '%'"
+          ></div>
+        </div>
+      </div>
+
+      <div class="flex justify-between items-center text-sm mt-3 mb-1">
+        <span>Expérience</span>
+        <span>{{ activeHero.experience }}/{{ activeHero.level * 100 }}</span>
+      </div>
+      <div class="rpgui-progress" data-rpguitype="progress">
+        <div class="rpgui-progress-track">
+          <div
+            class="rpgui-progress-fill"
+            [style.width]="getXpPercentage() + '%'"
+          ></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Attributs -->
+    <div class="rpgui-container framed-grey-sm mb-4 p-3">
+      <h4 class="!text-base !mb-2">Attributs</h4>
+      <div class="grid grid-cols-2 gap-2">
+        <div class="flex justify-between">
+          <span class="text-sm">Force</span>
+          <span class="text-sm">{{ activeHero.stats.strength }}</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-sm">Magie</span>
+          <span class="text-sm">{{ activeHero.stats.magic }}</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-sm">Agilité</span>
+          <span class="text-sm">{{ activeHero.stats.agility }}</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-sm">Vitesse</span>
+          <span class="text-sm">{{ activeHero.stats.speed }}</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-sm">Charisme</span>
+          <span class="text-sm">{{ activeHero.stats.charisma }}</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-sm">Chance</span>
+          <span class="text-sm">{{ activeHero.stats.luck }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Or -->
+    <div class="flex items-center justify-between">
+      <div class="flex items-center">
+        <div class="rpgui-icon coin-bag mr-2"></div>
+        <span class="text-yellow-400">{{ activeHero.money }} pièces d'or</span>
+      </div>
+      <button class="rpgui-button" routerLink="/dashboard">
+        <p>JOUER</p>
+      </button>
+    </div>
+  </div>
+</section>

@@ -66,6 +66,13 @@ export class HeroService {
     return this.http.delete<{ message: string }>(`${this.apiUrl}/${id}`);
   }
 
+  activateHero(id: number): Observable<{ message: string }> {
+    return this.http.put<{ message: string }>(
+      `${this.apiUrl}/${id}/activate`,
+      {}
+    );
+  }
+
   getHeroInventory(id: number): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/${id}/inventory`);
   }

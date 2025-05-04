@@ -1,7 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
+import { ActiveHeroComponent } from '../active-hero/active-hero.component';
 import { AuthService } from '../auth/auth.service';
+import { GlobalStateService } from '../services/global-state.service';
 import { Hero, HeroService } from '../services/hero.service';
 
 interface User {
@@ -14,7 +16,7 @@ interface User {
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, ActiveHeroComponent],
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.scss'],
 })
@@ -27,7 +29,8 @@ export class ProfileComponent implements OnInit {
   constructor(
     private router: Router,
     private authService: AuthService,
-    private heroService: HeroService
+    private heroService: HeroService,
+    private globalState: GlobalStateService
   ) {}
 
   ngOnInit(): void {
@@ -59,6 +62,12 @@ export class ProfileComponent implements OnInit {
       next: (heroes) => {
         this.characters = heroes;
         this.loading = false;
+
+        // Mettre à jour le héros actif dans l'état global
+        const activeHero = heroes.find((hero) => hero.isActive);
+        if (activeHero) {
+          this.globalState.setActiveHero(activeHero);
+        }
       },
       error: (err) => {
         console.error('Erreur lors du chargement des héros:', err);
@@ -102,6 +111,7 @@ export class ProfileComponent implements OnInit {
       case 'prêtre':
       case 'pretre':
       case 'cleric':
+      case 'scientist':
       case 'healer':
         return 'potion';
       default:
@@ -125,18 +135,11 @@ export class ProfileComponent implements OnInit {
 
   onSelectCharacter(character: Hero): void {
     // Mettre à jour le héros actif
-    const updatedHero = { ...character, isActive: true };
-
-    this.heroService.updateHero(character.id, { isActive: true }).subscribe({
+    this.heroService.activateHero(character.id).subscribe({
       next: () => {
-        // Mettre tous les autres héros à inactifs
-        this.characters = this.characters.map((hero) => ({
-          ...hero,
-          isActive: hero.id === character.id,
-        }));
-
-        // Redirection vers le tableau de bord
-        this.router.navigate(['/dashboard']);
+        // Mettre à jour l'état global et recharger les personnages
+        this.globalState.setActiveHero({ ...character, isActive: true });
+        this.loadCharacters(); // Recharger les personnages après la sélection
       },
       error: (err) => {
         console.error('Erreur lors de la sélection du héros:', err);
