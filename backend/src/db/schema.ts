@@ -11,22 +11,18 @@ export const usersTable = sql.sqliteTable("users", {
 
 export const heroesTable = sql.sqliteTable("heroes", {
   id: sql.integer("id").primaryKey(),
-  userId: sql.integer("user_id").references(() => usersTable.id, { onDelete: "cascade" }),
+  userId: sql
+    .integer("user_id")
+    .references(() => usersTable.id, { onDelete: "cascade" })
+    .notNull(),
   name: sql.text("name").notNull(),
   race: sql.text("race").notNull(),
   classType: sql.text("class_type").notNull(),
-  level: sql.integer("level").notNull().default(1),
   experience: sql.integer("experience").notNull().default(0),
+  level: sql.integer("level").notNull().default(1),
+  stats: sql.text("stats").notNull().notNull(),
+  health: sql.integer("health").notNull().default(100),
   money: sql.integer("money").notNull().default(0),
-  health: sql.integer("health").notNull(),
-  strength: sql.integer("strength").notNull(),
-  agility: sql.integer("agility").notNull(),
-  magic: sql.integer("magic").notNull(),
-  endurance: sql.integer("endurance").notNull(),
-  luck: sql.integer("luck").notNull(),
-  speed: sql.integer("speed").notNull(),
-  attack: sql.integer("attack").notNull(),
-  defense: sql.integer("defense").notNull(),
   isActive: sql.integer("is_active", { mode: "boolean" }).notNull().default(false),
   createdAt: sql.integer("created_at", { mode: "timestamp" }).$defaultFn(() => new Date()),
 });
@@ -37,10 +33,6 @@ export const itemsTable = sql.sqliteTable("items", {
   type: sql.text("type").notNull(),
   price: sql.integer("price").notNull(),
   durability: sql.integer("durability").notNull().default(100),
-  rarity: sql.text("rarity").notNull(),
-  description: sql.text("description"),
-  statModifier: sql.text("stat_modifier"), // JSON string of stat modifications
-  createdAt: sql.integer("created_at", { mode: "timestamp" }).$defaultFn(() => new Date()),
 });
 
 export const inventoryTable = sql.sqliteTable("inventory", {
