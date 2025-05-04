@@ -40,7 +40,6 @@ export const inventoryTable = sql.sqliteTable("inventory", {
   heroId: sql.integer("hero_id").references(() => heroesTable.id, { onDelete: "cascade" }),
   itemId: sql.integer("item_id").references(() => itemsTable.id),
   quantity: sql.integer("quantity").notNull().default(1),
-  isEquipped: sql.integer("is_equipped", { mode: "boolean" }).notNull().default(false),
   createdAt: sql.integer("created_at", { mode: "timestamp" }).$defaultFn(() => new Date()),
 });
 

@@ -2,12 +2,12 @@ import { zValidator } from "@hono/zod-validator";
 import { and, eq } from "drizzle-orm";
 import { Hono } from "hono";
 import { jwt } from "hono/jwt";
-import db from "./db";
-import { heroesTable } from "./db/schema";
-import { Hero } from "./game/models/Hero";
-import { Stat } from "./game/models/Stat";
-import { HeroService } from "./services/hero.service";
-import { InventoryService } from "./services/inventory.service";
+import db from "../db";
+import { heroesTable } from "../db/schema";
+import { Hero } from "../game/models/Hero";
+import { Stat } from "../game/models/Stat";
+import { HeroService } from "../services/hero.service";
+import { InventoryService } from "../services/inventory.service";
 import {
   CreateHeroRequest,
   HeroIdParam,
@@ -15,8 +15,8 @@ import {
   createHeroSchema,
   heroIdParamSchema,
   updateHeroSchema,
-} from "./types/hero.types";
-import { AddItemRequest, addItemToInventorySchema, inventoryItemParamSchema } from "./types/inventory.types";
+} from "../types/hero.types";
+import { AddItemRequest, addItemToInventorySchema, inventoryItemParamSchema } from "../types/inventory.types";
 
 const heroesRouter = new Hono();
 
@@ -145,20 +145,6 @@ heroesRouter.delete("/:id", zValidator("param", heroIdParamSchema), async (c) =>
     .execute();
 
   return c.json({ message: "Hero deleted successfully" }, 200);
-});
-
-heroesRouter.get("/:id/stats", zValidator("param", heroIdParamSchema), async (c) => {
-  const payload = c.get("jwtPayload");
-  const userId = payload.id;
-
-  const { id } = (await c.req.valid("param")) as HeroIdParam;
-
-  const hero = await HeroService.getHeroById(Number(id), userId);
-  if (!hero) {
-    return c.json({ message: "Hero not found" }, 404);
-  }
-
-  return c.json({ heroId: hero.id, stats: hero.stats }, 200);
 });
 
 // Routes pour l'inventaire

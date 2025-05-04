@@ -4,8 +4,8 @@ import { eq } from "drizzle-orm";
 import { Hono } from "hono";
 import { sign } from "hono/jwt";
 import { z } from "zod";
-import db from "./db";
-import { usersTable } from "./db/schema";
+import db from "../db";
+import { usersTable } from "../db/schema";
 
 const authRouter = new Hono();
 
