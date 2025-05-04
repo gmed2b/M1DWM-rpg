@@ -1,6 +1,6 @@
 // BattleService.ts
-import type { Avatar } from "../game/models/Avatar";
-import type { Hero } from "../game/models/Hero";
+import type { Avatar } from "./models/Avatar";
+import type { Hero } from "./models/Hero";
 
 /**
  * This service is responsible for handling the battle logic
@@ -11,7 +11,10 @@ export class BattleService {
   private defender: Avatar;
   private battleLog: string[] = [];
 
-  constructor(private player: Hero, private opponent: Avatar) {
+  constructor(
+    private player: Hero,
+    private opponent: Avatar
+  ) {
     // Initialize battle log
     this.logInitiative();
 
@@ -19,8 +22,7 @@ export class BattleService {
     if (this.player.initiative > this.opponent.initiative) {
       this.attacker = player;
       this.defender = opponent;
-    }
-    else {
+    } else {
       this.attacker = opponent;
       this.defender = player;
     }
@@ -31,9 +33,8 @@ export class BattleService {
    */
   private logInitiative(): void {
     this.log(
-      `Initiative rolls: ${this.player.name}: ${this.player.initiative.toFixed(
-        2,
-      )}, ` + `${this.opponent.name}: ${this.opponent.initiative.toFixed(2)}`,
+      `Initiative rolls: ${this.player.name}: ${this.player.initiative.toFixed(2)}, ` +
+        `${this.opponent.name}: ${this.opponent.initiative.toFixed(2)}`
     );
   }
 
@@ -69,14 +70,11 @@ export class BattleService {
 
     if (defense.partialDodge) {
       this.log(`${this.defender.name} partially dodges the attack!`);
-    }
-    else {
+    } else {
       this.log(`${this.defender.name} takes full impact!`);
     }
 
-    this.log(
-      `${this.defender.name} takes ${defense.damagesTaken} damage. Health: ${this.defender.health}`,
-    );
+    this.log(`${this.defender.name} takes ${defense.damagesTaken} damage. Health: ${this.defender.health}`);
 
     // Return true if defender is defeated, false otherwise
     if (this.defender.isDead) {
@@ -101,9 +99,7 @@ export class BattleService {
       this.player.gainExperience(expGained);
 
       if (this.player.level > initialLevel) {
-        this.log(
-          `LEVEL UP! ${this.player.name} reached level ${this.player.level}!`,
-        );
+        this.log(`LEVEL UP! ${this.player.name} reached level ${this.player.level}!`);
       }
 
       // Award gold
@@ -123,9 +119,7 @@ export class BattleService {
       this.log(`--- Round ${round} ---`);
 
       // Ajout de l'affichage de la vie des joueurs au début du round
-      this.log(
-        `${this.player.name}: ${this.player.health} HP | ${this.opponent.name}: ${this.opponent.health} HP`,
-      );
+      this.log(`${this.player.name}: ${this.player.health} HP | ${this.opponent.name}: ${this.opponent.health} HP`);
 
       // First combatant's turn
       if (this.processAttack()) {

@@ -1,9 +1,7 @@
+import "dotenv/config";
 import app from "./app";
-import env from "./env";
-
-const port = env.PORT;
 
 export default {
+  port: process.env.PORT || 3000,
   fetch: app.fetch,
-  port,
 };
