@@ -160,4 +160,29 @@ heroesRouter.put(
   }
 );
 
+heroesRouter.delete("/:id", zValidator("param", z.object({ id: z.string() })), async (c) => {
+  const payload = c.get("jwtPayload");
+  const userId = payload.id;
+
+  const { id } = await c.req.valid("param");
+
+  const hero = await db
+    .select()
+    .from(heroesTable)
+    .where(and(eq(heroesTable.userId, userId), eq(heroesTable.id, Number(id))))
+    .limit(1)
+    .execute();
+
+  if (hero.length === 0) {
+    return c.json({ message: "Hero not found" }, 404);
+  }
+
+  await db
+    .delete(heroesTable)
+    .where(and(eq(heroesTable.userId, userId), eq(heroesTable.id, Number(id))))
+    .execute();
+
+  return c.json({ message: "Hero deleted successfully" }, 200);
+});
+
 export default heroesRouter;
