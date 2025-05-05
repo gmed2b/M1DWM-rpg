@@ -11,7 +11,7 @@ export class BattleService {
   private attacker: Avatar;
   private defender: Avatar;
   private battleLog: BattleLogEntry[] = [];
-  private currentRound: number = 0;
+  private currentRound: number = 1; // Initialiser à 1 au lieu de 0
 
   constructor(
     private player: Hero,
@@ -201,13 +201,9 @@ export class BattleService {
    * Executes the battle sequence and returns the result
    */
   battle(): BattleResult {
-    let round = 1;
-
     do {
-      this.currentRound = round;
-
       // Log round start
-      this.log("System", "System", 0, this.player.health, this.opponent.health, `--- Round ${round} ---`);
+      this.log("System", "System", 0, this.player.health, this.opponent.health, `--- Round ${this.currentRound} ---`);
 
       // Ajout de l'affichage de la vie des joueurs au début du round
       this.log(
@@ -235,7 +231,8 @@ export class BattleService {
       // Reset attacker for next round
       this.swapAttacker();
 
-      round++;
+      // Incrémentez le round à la fin de chaque tour complet
+      this.currentRound++;
     } while (this.player.isAlive && this.opponent.isAlive);
 
     const winner = this.player.isAlive ? this.player : this.opponent;
@@ -244,7 +241,7 @@ export class BattleService {
     return {
       winner,
       loser,
-      rounds: round,
+      rounds: this.currentRound, // Utiliser this.currentRound au lieu de round
       log: this.battleLog,
     };
   }
