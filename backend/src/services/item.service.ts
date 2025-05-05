@@ -67,8 +67,8 @@ export class ItemService {
    * @returns true si supprimé avec succès, false sinon
    */
   static async deleteItem(itemId: number) {
-    const result = await db.delete(itemsTable).where(eq(itemsTable.id, itemId)).execute();
-    return result.rowsAffected > 0;
+    const result = await db.delete(itemsTable).where(eq(itemsTable.id, itemId)).returning().execute();
+    return result.length > 0;
   }
 
   /**
@@ -85,7 +85,7 @@ export class ItemService {
     }
 
     // Ajouter les items par défaut
-    const result = await db.insert(itemsTable).values(itemsData).execute();
-    return result.rowsAffected;
+    const result = await db.insert(itemsTable).values(itemsData).returning().execute();
+    return result.length;
   }
 }

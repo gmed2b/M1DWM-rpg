@@ -20,7 +20,6 @@ export class InventoryService {
         heroId: inventoryTable.heroId,
         itemId: inventoryTable.itemId,
         quantity: inventoryTable.quantity,
-        createdAt: inventoryTable.createdAt,
         itemName: itemsTable.name,
         itemType: itemsTable.type,
         itemPrice: itemsTable.price,
@@ -104,9 +103,10 @@ export class InventoryService {
     const result = await db
       .delete(inventoryTable)
       .where(and(eq(inventoryTable.heroId, heroId), eq(inventoryTable.itemId, itemId)))
+      .returning()
       .execute();
 
-    return result.rowsAffected > 0;
+    return result.length > 0;
   }
 
   /**

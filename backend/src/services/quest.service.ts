@@ -593,9 +593,9 @@ export class QuestService {
    */
   static async deleteQuest(questId: number): Promise<boolean> {
     try {
-      const result = await db.delete(questsTable).where(eq(questsTable.id, questId)).execute();
+      const result = await db.delete(questsTable).where(eq(questsTable.id, questId)).returning().execute();
 
-      return result.rowsAffected > 0;
+      return result.length > 0;
     } catch (error) {
       console.error("Erreur lors de la suppression de la quête:", error);
       return false;
@@ -608,9 +608,9 @@ export class QuestService {
    */
   static async seedQuests(): Promise<number> {
     try {
-      const result = await db.insert(questsTable).values(questsData).execute();
+      const result = await db.insert(questsTable).values(questsData).returning().execute();
 
-      return result.rowsAffected || 0;
+      return result.length || 0;
     } catch (error) {
       console.error("Erreur lors de l'initialisation des quêtes:", error);
       return 0;
