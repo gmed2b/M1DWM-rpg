@@ -1,4 +1,5 @@
 // BattleService.ts
+import { BattleLogEntry } from "../types/battle.types";
 import type { Avatar } from "./models/Avatar";
 import type { Hero } from "./models/Hero";
 
@@ -9,7 +10,8 @@ import type { Hero } from "./models/Hero";
 export class BattleService {
   private attacker: Avatar;
   private defender: Avatar;
-  private battleLog: string[] = [];
+  private battleLog: BattleLogEntry[] = [];
+  private currentRound: number = 0;
 
   constructor(
     private player: Hero,
@@ -32,17 +34,34 @@ export class BattleService {
    * Logs initiative rolls and determines first attacker
    */
   private logInitiative(): void {
-    this.log(
+    const message =
       `Initiative rolls: ${this.player.name}: ${this.player.initiative.toFixed(2)}, ` +
-        `${this.opponent.name}: ${this.opponent.initiative.toFixed(2)}`
-    );
+      `${this.opponent.name}: ${this.opponent.initiative.toFixed(2)}`;
+
+    this.log("System", "System", 0, this.player.health, this.opponent.health, message);
   }
 
   /**
-   * Adds a message to the battle log
+   * Adds a structured message to the battle log
    */
-  private log(message: string): void {
-    this.battleLog.push(message);
+  private log(
+    attacker: string,
+    defender: string,
+    damage: number,
+    attackerHealth: number,
+    defenderHealth: number,
+    message: string
+  ): void {
+    this.battleLog.push({
+      round: this.currentRound,
+      attacker,
+      defender,
+      damage,
+      attackerHealth,
+      defenderHealth,
+      message,
+      timestamp: new Date(),
+    });
   }
 
   /**
@@ -58,27 +77,73 @@ export class BattleService {
    * Processes a single attack
    */
   private processAttack(): boolean {
-    this.log(`${this.attacker.name} attacks ${this.defender.name}!`);
+    // Log the attack
+    this.log(
+      this.attacker.name,
+      this.defender.name,
+      0,
+      this.attacker.health,
+      this.defender.health,
+      `${this.attacker.name} attacks ${this.defender.name}!`
+    );
 
     const attack = this.attacker.attack;
 
+    // Log if it's a critical hit
     if (attack.isCriticalHit) {
-      this.log(`CRITICAL HIT! Damage doubled!`);
+      this.log(
+        this.attacker.name,
+        this.defender.name,
+        0,
+        this.attacker.health,
+        this.defender.health,
+        "CRITICAL HIT! Damage doubled!"
+      );
     }
 
     const defense = this.defender.defend(attack.damages);
 
+    // Log dodge status
     if (defense.partialDodge) {
-      this.log(`${this.defender.name} partially dodges the attack!`);
+      this.log(
+        this.attacker.name,
+        this.defender.name,
+        0,
+        this.attacker.health,
+        this.defender.health,
+        `${this.defender.name} partially dodges the attack!`
+      );
     } else {
-      this.log(`${this.defender.name} takes full impact!`);
+      this.log(
+        this.attacker.name,
+        this.defender.name,
+        0,
+        this.attacker.health,
+        this.defender.health,
+        `${this.defender.name} takes full impact!`
+      );
     }
 
-    this.log(`${this.defender.name} takes ${defense.damagesTaken} damage. Health: ${this.defender.health}`);
+    // Log damage and remaining health
+    this.log(
+      this.attacker.name,
+      this.defender.name,
+      defense.damagesTaken,
+      this.attacker.health,
+      this.defender.health,
+      `${this.defender.name} takes ${defense.damagesTaken} damage. Health: ${this.defender.health}`
+    );
 
     // Return true if defender is defeated, false otherwise
     if (this.defender.isDead) {
-      this.log(`${this.defender.name} has been defeated!`);
+      this.log(
+        this.attacker.name,
+        this.defender.name,
+        0,
+        this.attacker.health,
+        this.defender.health,
+        `${this.defender.name} has been defeated!`
+      );
       this.processVictoryRewards();
       return true;
     }
@@ -95,17 +160,40 @@ export class BattleService {
       const expGained = this.opponent.level * 20;
       const initialLevel = this.player.level;
 
-      this.log(`${this.player.name} gains ${expGained} experience points.`);
+      this.log(
+        "System",
+        this.player.name,
+        0,
+        this.player.health,
+        this.defender.health,
+        `${this.player.name} gains ${expGained} experience points.`
+      );
+
       this.player.gainExperience(expGained);
 
       if (this.player.level > initialLevel) {
-        this.log(`LEVEL UP! ${this.player.name} reached level ${this.player.level}!`);
+        this.log(
+          "System",
+          this.player.name,
+          0,
+          this.player.health,
+          this.defender.health,
+          `LEVEL UP! ${this.player.name} reached level ${this.player.level}!`
+        );
       }
 
       // Award gold
       const goldGained = this.opponent.level * 5;
       this.player.money += goldGained;
-      this.log(`${this.player.name} loots ${goldGained} gold coins.`);
+
+      this.log(
+        "System",
+        this.player.name,
+        0,
+        this.player.health,
+        this.defender.health,
+        `${this.player.name} loots ${goldGained} gold coins.`
+      );
     }
   }
 
@@ -116,10 +204,20 @@ export class BattleService {
     let round = 1;
 
     do {
-      this.log(`--- Round ${round} ---`);
+      this.currentRound = round;
+
+      // Log round start
+      this.log("System", "System", 0, this.player.health, this.opponent.health, `--- Round ${round} ---`);
 
       // Ajout de l'affichage de la vie des joueurs au début du round
-      this.log(`${this.player.name}: ${this.player.health} HP | ${this.opponent.name}: ${this.opponent.health} HP`);
+      this.log(
+        "System",
+        "System",
+        0,
+        this.player.health,
+        this.opponent.health,
+        `${this.player.name}: ${this.player.health} HP | ${this.opponent.name}: ${this.opponent.health} HP`
+      );
 
       // First combatant's turn
       if (this.processAttack()) {
@@ -167,7 +265,7 @@ export interface BattleResult {
   winner: Avatar;
   loser: Avatar;
   rounds: number;
-  log: string[];
+  log: BattleLogEntry[];
 }
 
 export interface LootResult {

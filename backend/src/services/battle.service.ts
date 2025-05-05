@@ -154,25 +154,8 @@ export class BattleManager {
         }
       }
 
-      // Convertir le log de combat au format attendu
-      const battleLogEntries: BattleLogEntry[] = battleResult.log.map((entry, index) => {
-        // Si le log est déjà au bon format, le renvoyer tel quel
-        if (typeof entry !== "string") {
-          return entry as BattleLogEntry;
-        }
-
-        // Sinon, créer une entrée de log par défaut
-        return {
-          round: index + 1,
-          attacker: "Unknown",
-          defender: "Unknown",
-          damage: 0,
-          attackerHealth: 0,
-          defenderHealth: 0,
-          message: entry,
-          timestamp: new Date(),
-        };
-      });
+      // Les logs sont déjà au bon format, pas besoin de conversion
+      const battleLogEntries = battleResult.log;
 
       // Enregistrer le résultat en base de données
       const [savedBattle] = await db
