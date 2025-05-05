@@ -2,7 +2,8 @@
   "name": "backend",
   "type": "module",
   "scripts": {
-    "dev": "bun run --hot src/index.ts"
+    "dev": "bun run --hot src/index.ts",
+    "seed": "bun run src/db/seeds/seed.ts"
   },
   "dependencies": {
     "@hono/zod-validator": "^0.5.0",

@@ -2,6 +2,25 @@ import type { QuestEncounter } from "../../types/quest.types";
 
 /**
  * Données de quêtes par défaut pour initialiser la base de données
+ * Chaque quête possède:
+ * - name: Nom de la quête
+ * - description: Description détaillée de la quête
+ * - difficulty: Niveau de difficulté (1-10)
+ * - rewardExp: Points d'expérience gagnés à la complétion
+ * - rewardGold: Or gagné à la complétion
+ * - rewardItems: Objets reçus en récompense (IDs des items)
+ * - boardSize: Taille du plateau de jeu pour cette quête
+ * - encounters: Liste des rencontres sur le chemin de la quête
+ *   * position: Position sur le plateau où se trouve la rencontre
+ *   * type: Type de rencontre (monster, treasure, trap, rest)
+ *   * data: Données spécifiques à chaque type de rencontre
+ *
+ * Les quêtes sont organisées par niveau de difficulté croissant:
+ * - "La Forêt des Ombres" (difficulté 1): Parfaite pour les débutants
+ * - "Les Cavernes de Cristal" (difficulté 3): Pour aventuriers intermédiaires
+ * - "Les Ruines Anciennes" (difficulté 5): Pour aventuriers expérimentés
+ * - "La Tour du Mage" (difficulté 7): Pour héros confirmés
+ * - "Le Repaire du Dragon" (difficulté 10): Pour les héros légendaires uniquement
  */
 export const questsData = [
   {

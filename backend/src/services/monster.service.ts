@@ -73,9 +73,9 @@ export class MonsterService {
    * @returns true si supprimé, false sinon
    */
   static async deleteMonster(id: number): Promise<boolean> {
-    const result = await db.delete(monstersTable).where(eq(monstersTable.id, id)).execute();
+    const result = await db.delete(monstersTable).where(eq(monstersTable.id, id)).returning().execute();
 
-    return result.rowsAffected > 0;
+    return result.length > 0;
   }
 
   /**
@@ -83,8 +83,9 @@ export class MonsterService {
    * @returns Nombre de monstres créés
    */
   static async seedMonsters(): Promise<number> {
-    const result = await db.insert(monstersTable).values(monstersData).execute();
-    return result.rowsAffected || 0;
+    const result = await db.insert(monstersTable).values(monstersData).returning().execute();
+
+    return result.length || 0;
   }
 
   /**

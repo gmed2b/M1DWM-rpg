@@ -2,6 +2,19 @@ import { Stat } from "../../game/models/Stat";
 
 /**
  * Données de monstres par défaut pour initialiser la base de données
+ * Chaque monstre possède:
+ * - name: Nom du monstre
+ * - level: Niveau de difficulté du monstre
+ * - description: Description du monstre
+ * - health: Points de vie du monstre
+ * - stats: Statistiques du monstre (force, magie, agilité, vitesse, charisme, chance)
+ * - imageUrl: Chemin vers l'image du monstre pour l'affichage
+ *
+ * Les monstres sont organisés par niveaux de difficulté:
+ * - Niveau 1-3: Monstres débutants pour les premiers combats
+ * - Niveau 4-6: Monstres intermédiaires avec plus de puissance
+ * - Niveau 7-9: Monstres avancés représentant un défi important
+ * - Niveau 10: Boss finaux, très puissants
  */
 export const monstersData = [
   // Niveau 1-3 (Débutant)
