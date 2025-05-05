@@ -1,29 +1,51 @@
 import { Routes } from '@angular/router';
-import { authGuard, publicGuard } from './auth/auth.guard';
-import { CreateHeroComponent } from './create-hero/create-hero.component';
-import { DashboardComponent } from './dashboard/dashboard.component';
-import { LoginComponent } from './login/login.component';
-import { ProfileComponent } from './profile/profile.component';
-import { RegisterComponent } from './register/register.component';
+import { authGuard } from './auth/auth.guard';
 
 export const routes: Routes = [
-  { path: 'login', component: LoginComponent, canActivate: [publicGuard] },
+  {
+    path: 'login',
+    loadComponent: () =>
+      import('./login/login.component').then((m) => m.LoginComponent),
+  },
   {
     path: 'register',
-    component: RegisterComponent,
-    canActivate: [publicGuard],
-  },
-  { path: 'profile', component: ProfileComponent, canActivate: [authGuard] },
-  {
-    path: 'create-hero',
-    component: CreateHeroComponent,
-    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./register/register.component').then((m) => m.RegisterComponent),
   },
   {
     path: 'dashboard',
-    component: DashboardComponent,
+    loadComponent: () =>
+      import('./dashboard/dashboard.component').then(
+        (m) => m.DashboardComponent
+      ),
     canActivate: [authGuard],
   },
-  { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
-  { path: '**', redirectTo: '/dashboard' },
+  {
+    path: 'profile',
+    loadComponent: () =>
+      import('./profile/profile.component').then((m) => m.ProfileComponent),
+    canActivate: [authGuard],
+  },
+  {
+    path: 'create-hero',
+    loadComponent: () =>
+      import('./create-hero/create-hero.component').then(
+        (m) => m.CreateHeroComponent
+      ),
+    canActivate: [authGuard],
+  },
+  {
+    path: 'quests',
+    loadComponent: () =>
+      import('./quests/quests.component').then((m) => m.QuestsComponent),
+    canActivate: [authGuard],
+  },
+  {
+    path: 'battles',
+    loadComponent: () =>
+      import('./battles/battles.component').then((m) => m.BattlesComponent),
+    canActivate: [authGuard],
+  },
+  { path: '', redirectTo: '/login', pathMatch: 'full' },
+  { path: '**', redirectTo: '/login' },
 ];

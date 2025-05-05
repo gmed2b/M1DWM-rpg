@@ -1,0 +1,59 @@
+<section class="rpgui-container framed-golden">
+  <h2>Quêtes disponibles</h2>
+  <hr />
+
+  <!-- Message d'erreur -->
+  <div
+    *ngIf="error"
+    class="rpgui-container framed-grey mb-2 p-2 text-red-500 text-sm"
+  >
+    {{ error }}
+  </div>
+
+  <!-- Message de chargement -->
+  <div *ngIf="loading" class="p-2 text-sm">
+    <p>Chargement des quêtes...</p>
+  </div>
+
+  <!-- Si aucun héros actif -->
+  <div *ngIf="!activeHeroId && !loading" class="p-2 text-sm">
+    <p>Sélectionnez un héros actif pour voir les quêtes.</p>
+  </div>
+
+  <!-- Liste des quêtes -->
+  <div *ngIf="quests.length > 0" class="max-h-80 overflow-y-auto">
+    <div *ngFor="let quest of quests" class="p-3 mb-2">
+      <div class="flex justify-between items-center">
+        <h3>{{ quest.name }}</h3>
+        <div class="flex">
+          <ng-container
+            *ngFor="let star of getDifficultyStars(quest.difficulty)"
+          >
+            <div class="rpgui-icon star"></div>
+          </ng-container>
+          <ng-container
+            *ngFor="let emptyStar of getEmptyStars(quest.difficulty)"
+          >
+            <div class="rpgui-icon empty-slot"></div>
+          </ng-container>
+        </div>
+      </div>
+      <p class="text-sm">
+        {{ quest.description }}
+      </p>
+      <div class="text-sm mt-1">
+        Récompense:
+        <span class="rpgui-cursor-point"
+          >{{ quest.rewardGold }} or, {{ quest.rewardExp }} XP</span
+        >
+      </div>
+    </div>
+  </div>
+
+  <!-- Bouton pour voir toutes les quêtes -->
+  <div class="text-center mt-2">
+    <button class="rpgui-button" type="button" routerLink="/quests">
+      <p>VOIR TOUTES</p>
+    </button>
+  </div>
+</section>

@@ -11,7 +11,13 @@ import { AuthService } from '../auth/auth.service';
   styleUrl: './navbar.component.css',
 })
 export class NavbarComponent {
+  isMobileMenuOpen = false;
+
   constructor(private router: Router, public authService: AuthService) {}
+
+  toggleMobileMenu() {
+    this.isMobileMenuOpen = !this.isMobileMenuOpen;
+  }
 
   onHome() {
     this.router.navigate(['/']);
@@ -21,7 +27,7 @@ export class NavbarComponent {
     this.router.navigate(['/profile']);
   }
 
-  onLogout() {
+  logout() {
     this.authService.logout();
     this.router.navigate(['/login']);
   }

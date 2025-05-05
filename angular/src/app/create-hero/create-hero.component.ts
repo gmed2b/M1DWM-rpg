@@ -23,6 +23,19 @@ interface RaceOption {
   icon: string;
 }
 
+// Interface pour définir les préréglages de stats
+interface StatPreset {
+  strength: number;
+  magic: number;
+  agility: number;
+  speed: number;
+  charisma: number;
+  luck: number;
+}
+
+// Clé pour identifier une paire race/classe
+type RaceClassKey = `${string}_${string}`;
+
 @Component({
   selector: 'app-create-hero',
   standalone: true,
@@ -31,12 +44,17 @@ interface RaceOption {
   styleUrls: ['./create-hero.component.css'],
 })
 export class CreateHeroComponent implements OnInit {
+  // Points maximum que l'utilisateur peut attribuer
+  TOTAL_POINTS = 20;
+  MAX_STAT_VALUE = 20; // Valeur maximum pour chaque statistique
+  MIN_STAT_VALUE = 1; // Valeur minimum pour chaque statistique
+
   heroForm: FormGroup;
   createError: string | null = null;
   loading = false;
 
   // Points disponibles pour les statistiques
-  availablePoints = 20;
+  availablePoints = this.TOTAL_POINTS;
 
   // Options de classe
   classOptions: ClassOption[] = [
@@ -101,6 +119,177 @@ export class CreateHeroComponent implements OnInit {
     },
   ];
 
+  // Map des préréglages de stats pour chaque combinaison race/classe
+  statPresets: Record<RaceClassKey, StatPreset> = {
+    // Humain
+    human_warrior: {
+      strength: 8,
+      magic: 1,
+      agility: 4,
+      speed: 3,
+      charisma: 3,
+      luck: 1,
+    },
+    human_mage: {
+      strength: 2,
+      magic: 8,
+      agility: 2,
+      speed: 2,
+      charisma: 5,
+      luck: 1,
+    },
+    human_ranger: {
+      strength: 3,
+      magic: 2,
+      agility: 8,
+      speed: 4,
+      charisma: 2,
+      luck: 1,
+    },
+    human_rogue: {
+      strength: 3,
+      magic: 1,
+      agility: 6,
+      speed: 6,
+      charisma: 2,
+      luck: 2,
+    },
+    human_cleric: {
+      strength: 3,
+      magic: 6,
+      agility: 1,
+      speed: 2,
+      charisma: 7,
+      luck: 1,
+    },
+
+    // Elfe
+    elf_warrior: {
+      strength: 6,
+      magic: 3,
+      agility: 5,
+      speed: 3,
+      charisma: 2,
+      luck: 1,
+    },
+    elf_mage: {
+      strength: 1,
+      magic: 10,
+      agility: 2,
+      speed: 3,
+      charisma: 3,
+      luck: 1,
+    },
+    elf_ranger: {
+      strength: 2,
+      magic: 3,
+      agility: 9,
+      speed: 4,
+      charisma: 1,
+      luck: 1,
+    },
+    elf_rogue: {
+      strength: 2,
+      magic: 2,
+      agility: 6,
+      speed: 7,
+      charisma: 1,
+      luck: 2,
+    },
+    elf_cleric: {
+      strength: 2,
+      magic: 8,
+      agility: 2,
+      speed: 2,
+      charisma: 5,
+      luck: 1,
+    },
+
+    // Démon
+    demon_warrior: {
+      strength: 9,
+      magic: 2,
+      agility: 3,
+      speed: 2,
+      charisma: 1,
+      luck: 3,
+    },
+    demon_mage: {
+      strength: 3,
+      magic: 9,
+      agility: 1,
+      speed: 2,
+      charisma: 2,
+      luck: 3,
+    },
+    demon_ranger: {
+      strength: 4,
+      magic: 2,
+      agility: 7,
+      speed: 3,
+      charisma: 1,
+      luck: 3,
+    },
+    demon_rogue: {
+      strength: 3,
+      magic: 1,
+      agility: 5,
+      speed: 7,
+      charisma: 1,
+      luck: 3,
+    },
+    demon_cleric: {
+      strength: 3,
+      magic: 6,
+      agility: 2,
+      speed: 2,
+      charisma: 4,
+      luck: 3,
+    },
+
+    // Orc
+    orc_warrior: {
+      strength: 10,
+      magic: 1,
+      agility: 2,
+      speed: 3,
+      charisma: 1,
+      luck: 3,
+    },
+    orc_mage: {
+      strength: 5,
+      magic: 7,
+      agility: 1,
+      speed: 2,
+      charisma: 2,
+      luck: 3,
+    },
+    orc_ranger: {
+      strength: 6,
+      magic: 1,
+      agility: 6,
+      speed: 4,
+      charisma: 1,
+      luck: 2,
+    },
+    orc_rogue: {
+      strength: 6,
+      magic: 1,
+      agility: 4,
+      speed: 6,
+      charisma: 1,
+      luck: 2,
+    },
+    orc_cleric: {
+      strength: 5,
+      magic: 5,
+      agility: 2,
+      speed: 2,
+      charisma: 4,
+      luck: 2,
+    },
+  };
+
   selectedClass: ClassOption | null = null;
   selectedRace: RaceOption | null = null;
 
@@ -123,27 +312,57 @@ export class CreateHeroComponent implements OnInit {
       stats: this.fb.group({
         strength: [
           1,
-          [Validators.required, Validators.min(1), Validators.max(20)],
+          [
+            Validators.required,
+            Validators.min(this.MIN_STAT_VALUE),
+            Validators.max(this.MAX_STAT_VALUE),
+          ],
         ],
         magic: [
           1,
-          [Validators.required, Validators.min(1), Validators.max(20)],
+          [
+            Validators.required,
+            Validators.min(this.MIN_STAT_VALUE),
+            Validators.max(this.MAX_STAT_VALUE),
+          ],
         ],
         agility: [
           1,
-          [Validators.required, Validators.min(1), Validators.max(20)],
+          [
+            Validators.required,
+            Validators.min(this.MIN_STAT_VALUE),
+            Validators.max(this.MAX_STAT_VALUE),
+          ],
         ],
         speed: [
           1,
-          [Validators.required, Validators.min(1), Validators.max(20)],
+          [
+            Validators.required,
+            Validators.min(this.MIN_STAT_VALUE),
+            Validators.max(this.MAX_STAT_VALUE),
+          ],
         ],
         charisma: [
           1,
-          [Validators.required, Validators.min(1), Validators.max(20)],
+          [
+            Validators.required,
+            Validators.min(this.MIN_STAT_VALUE),
+            Validators.max(this.MAX_STAT_VALUE),
+          ],
         ],
-        luck: [1, [Validators.required, Validators.min(1), Validators.max(20)]],
+        luck: [
+          1,
+          [
+            Validators.required,
+            Validators.min(this.MIN_STAT_VALUE),
+            Validators.max(this.MAX_STAT_VALUE),
+          ],
+        ],
       }),
     });
+
+    // Appliquer le préréglage de stats par défaut
+    this.applyStatPreset();
   }
 
   ngOnInit(): void {
@@ -188,79 +407,38 @@ export class CreateHeroComponent implements OnInit {
     return this.heroForm.get('stats') as FormGroup;
   }
 
-  // Ajuste les statistiques en fonction de la classe choisie
-  adjustStatsForClass(classValue: string): void {
-    const statsGroup = this.heroForm.get('stats') as FormGroup;
+  // Ajuste les statistiques en fonction de la race et classe choisies
+  applyStatPreset(): void {
+    const race = this.race?.value;
+    const classType = this.class_type?.value;
 
-    // Réinitialiser d'abord toutes les stats à 5
-    Object.keys(statsGroup.controls).forEach((key) => {
-      statsGroup.get(key)?.setValue(5, { emitEvent: false });
-    });
+    if (race && classType) {
+      const presetKey = `${race}_${classType}` as RaceClassKey;
+      const preset = this.statPresets[presetKey];
 
-    // Puis ajuster selon la classe
-    switch (classValue) {
-      case 'warrior':
-        statsGroup.get('strength')?.setValue(8, { emitEvent: false });
-        statsGroup.get('agility')?.setValue(6, { emitEvent: false });
-        break;
-      case 'mage':
-        statsGroup.get('magic')?.setValue(8, { emitEvent: false });
-        statsGroup.get('charisma')?.setValue(6, { emitEvent: false });
-        break;
-      case 'ranger':
-        statsGroup.get('agility')?.setValue(8, { emitEvent: false });
-        statsGroup.get('speed')?.setValue(6, { emitEvent: false });
-        break;
-      case 'rogue':
-        statsGroup.get('speed')?.setValue(8, { emitEvent: false });
-        statsGroup.get('luck')?.setValue(6, { emitEvent: false });
-        break;
-      case 'cleric':
-        statsGroup.get('charisma')?.setValue(8, { emitEvent: false });
-        statsGroup.get('magic')?.setValue(6, { emitEvent: false });
-        break;
+      if (preset) {
+        const statsGroup = this.heroForm.get('stats') as FormGroup;
+
+        // Appliquer les valeurs du preset aux champs du formulaire
+        Object.keys(preset).forEach((stat) => {
+          statsGroup
+            .get(stat)
+            ?.setValue(preset[stat as keyof StatPreset], { emitEvent: false });
+        });
+
+        // Recalculer les points restants
+        this.calculateRemainingPoints();
+      }
     }
-
-    // Recalculer les points restants
-    this.calculateRemainingPoints();
   }
 
-  // Ajuste les statistiques en fonction de la race choisie
+  // Remplacer les anciennes méthodes d'ajustement des stats
+  adjustStatsForClass(classValue: string): void {
+    this.applyStatPreset();
+  }
+
   adjustStatsForRace(raceValue: string): void {
-    const statsGroup = this.heroForm.get('stats') as FormGroup;
-
-    // Ajuster selon la race (bonus supplémentaire)
-    switch (raceValue) {
-      case 'human':
-        statsGroup
-          .get('charisma')
-          ?.setValue(statsGroup.get('charisma')?.value + 1, {
-            emitEvent: false,
-          });
-        break;
-      case 'elf':
-        statsGroup
-          .get('magic')
-          ?.setValue(statsGroup.get('magic')?.value + 1, { emitEvent: false });
-        break;
-      case 'dwarf':
-        statsGroup
-          .get('strength')
-          ?.setValue(statsGroup.get('strength')?.value + 1, {
-            emitEvent: false,
-          });
-        break;
-      case 'orc':
-        statsGroup
-          .get('agility')
-          ?.setValue(statsGroup.get('agility')?.value + 1, {
-            emitEvent: false,
-          });
-        break;
-    }
-
-    // Recalculer les points restants
-    this.calculateRemainingPoints();
+    this.applyStatPreset();
   }
 
   // Calcule les points de statistiques restants
@@ -268,11 +446,14 @@ export class CreateHeroComponent implements OnInit {
     const statsGroup = this.heroForm.get('stats') as FormGroup;
     let usedPoints = 0;
 
+    // Calculer le total des points utilisés
     Object.keys(statsGroup.controls).forEach((key) => {
       usedPoints += statsGroup.get(key)?.value || 0;
     });
 
-    this.availablePoints = 50 - usedPoints;
+    // Le total des points disponibles est fixé à 20
+    const basePoints = 6; // 6 points de base (1 point par stat)
+    this.availablePoints = this.TOTAL_POINTS - (usedPoints - basePoints);
 
     // Si dépassement, on désactive le formulaire
     if (this.availablePoints < 0) {
@@ -285,7 +466,11 @@ export class CreateHeroComponent implements OnInit {
   // Incrémente une statistique
   incrementStat(statName: string): void {
     const control = this.stats.get(statName);
-    if (control && this.availablePoints > 0 && control.value < 20) {
+    if (
+      control &&
+      this.availablePoints > 0 &&
+      control.value < this.MAX_STAT_VALUE
+    ) {
       control.setValue(control.value + 1);
     }
   }
@@ -293,7 +478,7 @@ export class CreateHeroComponent implements OnInit {
   // Décrémente une statistique
   decrementStat(statName: string): void {
     const control = this.stats.get(statName);
-    if (control && control.value > 1) {
+    if (control && control.value > this.MIN_STAT_VALUE) {
       control.setValue(control.value - 1);
     }
   }

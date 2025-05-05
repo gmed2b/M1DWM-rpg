@@ -1,0 +1,96 @@
+<section class="rpgui-container framed-golden">
+  <h2>Derniers combats</h2>
+  <hr />
+
+  <!-- Message d'erreur -->
+  <div
+    *ngIf="error"
+    class="rpgui-container framed-grey mb-2 p-2 text-red-500 text-sm"
+  >
+    {{ error }}
+  </div>
+
+  <!-- Message de chargement -->
+  <div *ngIf="loading" class="p-2 text-sm">
+    <p>Chargement des combats...</p>
+  </div>
+
+  <!-- Si aucun héros actif -->
+  <div *ngIf="!activeHeroId && !loading" class="p-2 text-sm">
+    <p>Sélectionnez un héros actif pour voir vos combats.</p>
+  </div>
+
+  <!-- Liste des combats récents -->
+  <div *ngIf="battles.length > 0">
+    <div
+      *ngFor="let battle of battles"
+      class="rpgui-container framed-grey mb-2 p-2"
+    >
+      <div class="flex justify-between items-center">
+        <span
+          class="rpgui-text-shadow"
+          [ngClass]="
+            battle.winnerId === activeHeroId ? 'text-green-400' : 'text-red-400'
+          "
+        >
+          {{ battle.winnerId === activeHeroId ? "VICTOIRE" : "DÉFAITE" }}
+        </span>
+        <span
+          >vs
+          {{
+            battle.opponentType === "mob"
+              ? "Monstre #" + battle.opponentId
+              : "Héros #" + battle.opponentId
+          }}</span
+        >
+      </div>
+      <div class="flex justify-between text-sm mt-1">
+        <span>Rounds: {{ battle.rounds }}</span>
+        <span *ngIf="battle.winnerId === activeHeroId"
+          >+{{ battle.rewardExp }} XP, +{{ battle.rewardGold }} Or</span
+        >
+        <span *ngIf="battle.winnerId !== activeHeroId">+0 XP, +0 Or</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Message si aucun combat -->
+  <div
+    *ngIf="battles.length === 0 && !loading && activeHeroId"
+    class="p-2 text-sm"
+  >
+    <p>Vous n'avez pas encore participé à des combats.</p>
+  </div>
+
+  <!-- Statistiques et bouton historique -->
+  <div
+    *ngIf="battles.length > 0"
+    class="flex justify-between items-center mt-4"
+  >
+    <div>
+      <div>
+        Ratio V/D:
+        <span class="rpgui-cursor-point"
+          >{{ getWinLossRatio().wins }}/{{ getWinLossRatio().losses }}</span
+        >
+      </div>
+      <div>
+        Dégâts totaux:
+        <span class="rpgui-cursor-point">{{ getTotalDamage() }}</span>
+      </div>
+    </div>
+    <button class="rpgui-button" type="button" routerLink="/battles">
+      <p>HISTORIQUE</p>
+    </button>
+  </div>
+
+  <!-- Bouton pour accéder à la page des combats s'il n'y a pas de combats récents -->
+  <div
+    *ngIf="battles.length === 0 && !loading && activeHeroId"
+    class="text-center mt-2"
+  >
+    <button class="rpgui-button" type="button" routerLink="/battles">
+      <p>COMBATTRE</p>
+    </button>
+  </div>
+</section>

@@ -33,6 +33,31 @@
           <span class="text-xs"
             >{{ activeHero.race }} {{ activeHero.classType }}</span
           >
+          <button
+            class="rpgui-button golden-small py-1 px-2 text-xs"
+            (click)="toggleClassSelection()"
+          >
+            <p>Changer de classe</p>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sélecteur de classe (apparaît lorsque showClassSelection est true) -->
+    <div *ngIf="showClassSelection" class="rpgui-container framed mb-4 p-3">
+      <h4 class="!text-base !mb-2">Choisir une nouvelle classe</h4>
+      <div class="grid grid-cols-2 gap-2 mt-2">
+        <div *ngFor="let class of availableClasses">
+          <button
+            class="rpgui-button"
+            [ngClass]="{ golden: activeHero.classType === class }"
+            (click)="changeHeroClass(class)"
+          >
+            <div class="flex items-center">
+              <div class="rpgui-icon {{ getClassIcon(class) }} mr-2"></div>
+              <p>{{ class }}</p>
+            </div>
+          </button>
         </div>
       </div>
     </div>
@@ -47,7 +72,7 @@
         <div class="rpgui-progress-track">
           <div
             class="rpgui-progress-fill"
-            [style.width]="activeHero.health + '%'"
+            [ngStyle]="{ width: activeHero.health + '%' }"
           ></div>
         </div>
       </div>
@@ -60,7 +85,7 @@
         <div class="rpgui-progress-track">
           <div
             class="rpgui-progress-fill"
-            [style.width]="getXpPercentage() + '%'"
+            [ngStyle]="{ width: getXpPercentage() + '%' }"
           ></div>
         </div>
       </div>

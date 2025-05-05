@@ -9,6 +9,7 @@ import {
   switchMap,
   tap,
 } from 'rxjs';
+import { API_URL } from '../services/api-config';
 import { GlobalStateService } from '../services/global-state.service';
 import { Hero, HeroService } from '../services/hero.service';
 
@@ -23,7 +24,7 @@ interface User {
   providedIn: 'root',
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:9000/api/auth';
+  private apiUrl = `${API_URL}/auth`;
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
 
@@ -78,6 +79,24 @@ export class AuthService {
       catchError((error) => {
         console.error('Erreur lors du chargement du héros actif:', error);
         return of(null);
+      })
+    );
+  }
+
+  /**
+   * Récupère le héros actif depuis le GlobalStateService
+   * Cette méthode est utilisée par les composants qui ont besoin de connaître le héros actif
+   */
+  getActiveHero(): Observable<Hero | null> {
+    // Récupère le héros actif depuis le GlobalStateService
+    return this.globalState.activeHero$.pipe(
+      switchMap((hero) => {
+        // Si un héros actif existe, on le renvoie
+        if (hero) {
+          return of(hero);
+        }
+        // Sinon, on essaie de le charger depuis le serveur
+        return this.loadActiveHero();
       })
     );
   }

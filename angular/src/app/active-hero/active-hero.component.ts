@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { GlobalStateService } from '../services/global-state.service';
-import { Hero } from '../services/hero.service';
+import { Hero, HeroService } from '../services/hero.service';
 
 @Component({
   selector: 'app-active-hero',
@@ -15,8 +15,13 @@ export class ActiveHeroComponent implements OnInit {
   activeHero: Hero | null = null;
   loading = true;
   error: string | null = null;
+  availableClasses = ['Guerrier', 'Mage', 'Archer', 'Voleur', 'Prêtre'];
+  showClassSelection = false;
 
-  constructor(private globalState: GlobalStateService) {}
+  constructor(
+    private globalState: GlobalStateService,
+    private heroService: HeroService
+  ) {}
 
   ngOnInit(): void {
     // S'abonner au héros actif depuis le service global
@@ -69,5 +74,38 @@ export class ActiveHeroComponent implements OnInit {
       default:
         return 'sword';
     }
+  }
+
+  // Afficher le sélecteur de classe
+  toggleClassSelection(): void {
+    this.showClassSelection = !this.showClassSelection;
+  }
+
+  // Changer la classe du héros
+  changeHeroClass(newClass: string): void {
+    if (!this.activeHero) return;
+
+    this.loading = true;
+    this.heroService
+      .updateHero(this.activeHero.id, { classType: newClass })
+      .subscribe({
+        next: (response) => {
+          console.log('Classe mise à jour avec succès:', response);
+
+          // Utiliser la nouvelle méthode pour mettre à jour le héros actif
+          this.globalState.updateActiveHero({ classType: newClass });
+
+          // En plus, rafraîchir depuis l'API pour s'assurer que tout est à jour
+          this.globalState.refreshActiveHero();
+
+          this.showClassSelection = false;
+          this.loading = false;
+        },
+        error: (err) => {
+          console.error('Erreur lors de la mise à jour de la classe:', err);
+          this.error = 'Erreur lors de la mise à jour de la classe du héros.';
+          this.loading = false;
+        },
+      });
   }
 }

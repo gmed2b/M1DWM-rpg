@@ -26,6 +26,16 @@ export class ProfileComponent implements OnInit {
   loading = true;
   error: string | null = null;
 
+  // Mappage des classes en anglais vers français
+  private classTranslations: Record<string, string> = {
+    warrior: 'Guerrier',
+    mage: 'Mage',
+    ranger: 'Archer',
+    rogue: 'Voleur',
+    cleric: 'Prêtre',
+    // Ajouter d'autres traductions si nécessaire
+  };
+
   constructor(
     private router: Router,
     private authService: AuthService,
@@ -117,6 +127,16 @@ export class ProfileComponent implements OnInit {
       default:
         return 'sword';
     }
+  }
+
+  /**
+   * Traduit le nom de la classe du héros de l'anglais vers le français
+   * @param classType Le type de classe en anglais (ex: 'warrior')
+   * @returns Le nom de la classe traduit en français (ex: 'Guerrier')
+   */
+  translateHeroClass(classType: string): string {
+    const lowercase = classType.toLowerCase();
+    return this.classTranslations[lowercase] || classType;
   }
 
   formatPlayTime(minutes?: number): string {

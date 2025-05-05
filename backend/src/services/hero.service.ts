@@ -139,14 +139,29 @@ export class HeroService {
     const heroExists = await this.getHeroById(heroId, userId);
     if (!heroExists) return null;
 
+    // Préparer un objet avec les champs à mettre à jour
+    const updateFields: Partial<Record<keyof (typeof heroesTable)["$inferInsert"], any>> = {};
+
+    // Ajouter uniquement les champs fournis dans la requête
+    if (heroData.name !== undefined) updateFields.name = heroData.name;
+    if (heroData.race !== undefined) updateFields.race = heroData.race;
+    if (heroData.class_type !== undefined) updateFields.classType = heroData.class_type;
+    if (heroData.classType !== undefined) updateFields.classType = heroData.classType;
+    if (heroData.health !== undefined) updateFields.health = heroData.health;
+    if (heroData.experience !== undefined) updateFields.experience = heroData.experience;
+    if (heroData.level !== undefined) updateFields.level = heroData.level;
+    if (heroData.money !== undefined) updateFields.money = heroData.money;
+    if (heroData.isActive !== undefined) updateFields.isActive = heroData.isActive;
+
+    // Si aucun champ n'est fourni, retourner le héros existant
+    if (Object.keys(updateFields).length === 0) {
+      return heroExists;
+    }
+
     // Mise à jour en base de données
     const [updatedHero] = await db
       .update(heroesTable)
-      .set({
-        name: heroData.name,
-        race: heroData.race,
-        classType: heroData.class_type,
-      })
+      .set(updateFields)
       .where(and(eq(heroesTable.userId, userId), eq(heroesTable.id, heroId)))
       .returning()
       .execute();
@@ -169,9 +184,10 @@ export class HeroService {
     const result = await db
       .delete(heroesTable)
       .where(and(eq(heroesTable.userId, userId), eq(heroesTable.id, heroId)))
+      .returning()
       .execute();
 
-    return result.rowsAffected > 0;
+    return result.length > 0;
   }
 
   /**

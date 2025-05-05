@@ -1,0 +1,240 @@
+<section class="rpgui-container framed">
+  <h1 class="!text-2xl">Arène de Combat</h1>
+  <hr class="golden mb-4" />
+
+  <!-- Message d'erreur -->
+  <div *ngIf="error" class="rpgui-container framed-grey mb-4 p-2 text-red-500">
+    {{ error }}
+  </div>
+
+  <!-- Message de chargement -->
+  <div *ngIf="loading" class="rpgui-container framed-grey p-2">
+    <p>Chargement des combats...</p>
+  </div>
+
+  <!-- Si aucun héros actif -->
+  <div
+    *ngIf="!activeHeroId && !loading"
+    class="rpgui-container framed-grey p-2 mb-4"
+  >
+    <p>Vous devez sélectionner un héros actif pour participer aux combats.</p>
+    <button class="rpgui-button" routerLink="/profile">
+      <p>Aller à mon profil</p>
+    </button>
+  </div>
+
+  <!-- Interface principale des combats -->
+  <div *ngIf="activeHero && !currentBattle && !battleInProgress">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+      <!-- Section héros -->
+      <section class="rpgui-container framed-golden">
+        <h2>Votre Héros</h2>
+        <hr />
+        <div class="p-3">
+          <div class="flex justify-between items-center mb-2">
+            <h3>{{ activeHero.name }}</h3>
+            <span class="text-sm">Niveau {{ activeHero.level }}</span>
+          </div>
+          <div class="mb-3">
+            <div class="flex justify-between text-sm">
+              <span>Santé:</span>
+              <span>{{ activeHero.health }}/100</span>
+            </div>
+            <div
+              class="rpgui-progress red"
+              [attr.data-value]="activeHero.health / 100"
+            >
+              <div class="rpgui-progress-track">
+                <div
+                  class="rpgui-progress-fill"
+                  [style.width.%]="activeHero.health"
+                ></div>
+              </div>
+            </div>
+          </div>
+          <div class="flex justify-between items-center">
+            <div>
+              <p class="text-sm">Race: {{ activeHero.race }}</p>
+              <p class="text-sm">Classe: {{ activeHero.classType }}</p>
+            </div>
+            <button
+              *ngIf="activeHero.health < 100"
+              class="rpgui-button"
+              (click)="restHero()"
+            >
+              <p>SE REPOSER</p>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section adversaires -->
+      <section class="rpgui-container framed-golden">
+        <h2>Adversaires</h2>
+        <hr />
+        <div class="p-3 max-h-80 overflow-y-auto">
+          <div
+            *ngFor="let opponent of opponents"
+            class="rpgui-container framed-grey mb-2 p-2"
+          >
+            <div class="flex justify-between items-center">
+              <h3>{{ opponent.name }}</h3>
+              <span class="text-sm">Niveau {{ opponent.level }}</span>
+            </div>
+            <p class="text-sm mb-2">
+              Un adversaire de niveau {{ opponent.level }}
+            </p>
+            <button
+              class="rpgui-button"
+              [disabled]="activeHero.health < 20"
+              (click)="startBattle(opponent.id)"
+            >
+              <p>COMBATTRE</p>
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Historique des combats -->
+    <section *ngIf="battles.length > 0">
+      <h2>Historique des combats</h2>
+      <hr class="golden mb-4" />
+
+      <div class="grid grid-cols-1 gap-2">
+        <div
+          *ngFor="let battle of battles.slice(0, 5)"
+          class="rpgui-container framed-grey p-2"
+        >
+          <div class="flex justify-between items-center">
+            <span
+              class="rpgui-text-shadow"
+              [ngClass]="
+                battle.winnerId === activeHeroId
+                  ? 'text-green-400'
+                  : 'text-red-400'
+              "
+            >
+              {{ battle.winnerId === activeHeroId ? "VICTOIRE" : "DÉFAITE" }}
+            </span>
+            <span
+              >vs
+              {{
+                battle.opponentType === "mob"
+                  ? "Monstre #" + battle.opponentId
+                  : "Héros #" + battle.opponentId
+              }}</span
+            >
+          </div>
+          <div class="flex justify-between text-sm mt-1">
+            <span>{{ battle.rounds }} rounds</span>
+            <span *ngIf="battle.winnerId === activeHeroId"
+              >+{{ battle.rewardExp }} XP, +{{ battle.rewardGold }} Or</span
+            >
+            <span *ngIf="battle.winnerId !== activeHeroId">+0 XP, +0 Or</span>
+          </div>
+          <div class="text-center mt-2">
+            <button
+              class="rpgui-button"
+              type="button"
+              (click)="viewBattleDetails(battle.id)"
+            >
+              <p>DÉTAILS</p>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Statistiques de combat -->
+      <div class="flex justify-between items-center mt-4">
+        <div>
+          <div>
+            Ratio V/D:
+            <span class="rpgui-cursor-point"
+              >{{ getWinLossRatio().wins }}/{{ getWinLossRatio().losses }}</span
+            >
+          </div>
+          <div>
+            Dégâts totaux:
+            <span class="rpgui-cursor-point">{{ getTotalDamage() }}</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Message si aucun combat -->
+    <div
+      *ngIf="battles.length === 0 && !loading"
+      class="rpgui-container framed-grey p-2 mt-4"
+    >
+      <p>
+        Vous n'avez pas encore participé à des combats. Choisissez un adversaire
+        pour commencer!
+      </p>
+    </div>
+  </div>
+
+  <!-- Affichage d'un combat en cours -->
+  <div *ngIf="battleInProgress" class="rpgui-container framed-golden p-4">
+    <h2 class="text-center">Combat en cours...</h2>
+    <div class="text-center py-6">
+      <div class="rpgui-icon sword"></div>
+      <p class="mt-4">Le combat est en cours de résolution...</p>
+      <p class="mt-2">Veuillez patienter pendant que les dés roulent!</p>
+    </div>
+  </div>
+
+  <!-- Affichage des détails d'un combat -->
+  <div
+    *ngIf="currentBattle && !battleInProgress"
+    class="rpgui-container framed-golden p-4"
+  >
+    <div class="flex justify-between items-center mb-4">
+      <h2>Résultat du combat</h2>
+      <button class="rpgui-button" (click)="closeBattleDetails()">
+        <p>FERMER</p>
+      </button>
+    </div>
+    <hr class="golden mb-4" />
+
+    <!-- Résultat et informations générales -->
+    <div class="rpgui-container framed p-3 mb-4">
+      <div class="flex justify-between items-center mb-2">
+        <h3
+          class="rpgui-text-shadow"
+          [ngClass]="currentBattle.heroWon ? 'text-green-400' : 'text-red-400'"
+        >
+          {{ currentBattle.heroWon ? "VICTOIRE!" : "DÉFAITE!" }}
+        </h3>
+        <span>vs {{ currentBattle.opponentName }}</span>
+      </div>
+      <p>Combat terminé en {{ currentBattle.rounds }} rounds</p>
+      <div *ngIf="currentBattle.heroWon" class="mt-2">
+        <p>Récompenses:</p>
+        <ul class="list-disc pl-5">
+          <li>Expérience: +{{ currentBattle.rewardExp }}</li>
+          <li>Or: +{{ currentBattle.rewardGold }}</li>
+          <li
+            *ngIf="
+              currentBattle.rewardItems && currentBattle.rewardItems.length > 0
+            "
+          >
+            Objets: {{ currentBattle.rewardItems.length }} objet(s)
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Journal de combat -->
+    <h3>Journal de combat</h3>
+    <div class="rpgui-container framed-grey p-2 mb-3 max-h-80 overflow-y-auto">
+      <div *ngFor="let entry of currentBattle.battleLog" class="mb-2">
+        <div *ngIf="entry.message" class="text-sm">{{ entry.message }}</div>
+        <div *ngIf="!entry.message" class="text-sm">
+          Round {{ entry.round }}: {{ entry.attacker }} attaque
+          {{ entry.defender }} pour {{ entry.damage }} dégâts.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

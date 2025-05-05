@@ -1,0 +1,182 @@
+<section class="rpgui-container framed">
+  <h1 class="!text-2xl">Quêtes</h1>
+  <hr class="golden mb-4" />
+
+  <!-- Message d'erreur -->
+  <div *ngIf="error" class="rpgui-container framed-grey mb-4 p-2 text-red-500">
+    {{ error }}
+  </div>
+
+  <!-- Message de chargement -->
+  <div *ngIf="loading" class="rpgui-container framed-grey p-2">
+    <p>Chargement des quêtes...</p>
+  </div>
+
+  <!-- Si aucun héros actif -->
+  <div
+    *ngIf="!activeHeroId && !loading"
+    class="rpgui-container framed-grey p-2 mb-4"
+  >
+    <p>
+      Vous devez sélectionner un héros actif pour voir et participer aux quêtes.
+    </p>
+    <button class="rpgui-button" routerLink="/profile">
+      <p>Aller à mon profil</p>
+    </button>
+  </div>
+
+  <!-- Quêtes actives -->
+  <section *ngIf="activeQuests.length > 0" class="mb-8">
+    <h2 class="mb-2">Quêtes en cours</h2>
+    <hr class="golden mb-4" />
+
+    <div class="grid grid-cols-1 gap-4">
+      <div
+        *ngFor="let activeQuest of activeQuests"
+        class="rpgui-container framed-golden-2 p-3"
+      >
+        <div class="flex justify-between items-center mb-2">
+          <h3>{{ activeQuest.quest?.name }}</h3>
+          <div class="flex">
+            <ng-container
+              *ngFor="
+                let star of getDifficultyStars(
+                  activeQuest.quest?.difficulty || 0
+                )
+              "
+            >
+              <div class="rpgui-icon star"></div>
+            </ng-container>
+            <ng-container
+              *ngFor="
+                let emptyStar of getEmptyStars(
+                  activeQuest.quest?.difficulty || 0
+                )
+              "
+            >
+              <div class="rpgui-icon empty-slot"></div>
+            </ng-container>
+          </div>
+        </div>
+
+        <p class="text-sm">{{ activeQuest.quest?.description }}</p>
+
+        <!-- Progression -->
+        <div class="my-3">
+          <p class="text-sm mb-1">
+            Progression: {{ activeQuest.currentPosition }} /
+            {{ activeQuest.quest?.boardSize }}
+          </p>
+          <div
+            class="rpgui-progress"
+            [attr.data-value]="
+              activeQuest.currentPosition / activeQuest.quest?.boardSize
+            "
+          >
+            <div class="rpgui-progress-track">
+              <div
+                class="rpgui-progress-fill"
+                [style.width.%]="
+                  (activeQuest.currentPosition / activeQuest.quest?.boardSize) *
+                  100
+                "
+              ></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Journal de quête (3 dernières entrées) -->
+        <div
+          *ngIf="activeQuest.log && activeQuest.log.length > 0"
+          class="rpgui-container framed-grey p-2 mb-3 max-h-40 overflow-y-auto"
+        >
+          <div
+            *ngFor="let entry of activeQuest.log.slice().reverse().slice(0, 3)"
+            class="mb-2"
+          >
+            <p class="text-sm">{{ entry.message }}</p>
+            <small>{{ entry.timestamp | date : "short" }}</small>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex justify-between mt-2">
+          <button
+            class="rpgui-button"
+            (click)="progressInQuest(activeQuest.quest?.id)"
+          >
+            <p>AVANCER</p>
+          </button>
+          <button
+            class="rpgui-button"
+            (click)="abandonQuest(activeQuest.quest?.id)"
+          >
+            <p>ABANDONNER</p>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Quêtes disponibles -->
+  <section *ngIf="quests.length > 0 && activeHeroId">
+    <h2 class="mb-2">Quêtes disponibles</h2>
+    <hr class="golden mb-4" />
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div *ngFor="let quest of quests" class="rpgui-container framed p-3">
+        <div class="flex justify-between items-center mb-2">
+          <h3>{{ quest.name }}</h3>
+          <div class="flex">
+            <ng-container
+              *ngFor="let star of getDifficultyStars(quest.difficulty)"
+            >
+              <div class="rpgui-icon star"></div>
+            </ng-container>
+            <ng-container
+              *ngFor="let emptyStar of getEmptyStars(quest.difficulty)"
+            >
+              <div class="rpgui-icon empty-slot"></div>
+            </ng-container>
+          </div>
+        </div>
+
+        <p class="text-sm">{{ quest.description }}</p>
+
+        <!-- Récompenses -->
+        <div class="text-sm mt-2 mb-3">
+          <p>
+            Récompenses:
+            <span class="rpgui-cursor-point"
+              >{{ quest.rewardGold }} or, {{ quest.rewardExp }} XP</span
+            >
+            <span *ngIf="quest.rewardItems && quest.rewardItems.length > 0">
+              , {{ quest.rewardItems.length }} objet(s)
+            </span>
+          </p>
+        </div>
+
+        <!-- Progression existante ou bouton démarrer -->
+        <div *ngIf="isQuestActive(quest.id); else startQuestBlock" class="mt-2">
+          <p class="text-sm mb-1">
+            Vous avez déjà une quête active pour cette aventure.
+          </p>
+        </div>
+
+        <ng-template #startQuestBlock>
+          <button class="rpgui-button" (click)="startQuest(quest.id)">
+            <p>DÉMARRER</p>
+          </button>
+        </ng-template>
+      </div>
+    </div>
+  </section>
+
+  <!-- Message si aucune quête disponible -->
+  <div
+    *ngIf="!loading && quests.length === 0"
+    class="rpgui-container framed-grey p-2"
+  >
+    <p>Aucune quête disponible pour le moment. Revenez plus tard!</p>
+  </div>
+</section>

@@ -46,9 +46,15 @@ export type CreateHeroRequest = z.infer<typeof createHeroSchema>;
 
 // Type pour la route de mise à jour d'un héros
 export const updateHeroSchema = z.object({
-  name: z.string().nonempty(),
-  race: z.string().nonempty(),
-  class_type: z.string().nonempty(),
+  name: z.string().nonempty().optional(),
+  race: z.string().nonempty().optional(),
+  class_type: z.string().nonempty().optional(),
+  classType: z.string().nonempty().optional(),
+  health: z.number().int().min(0).max(100).optional(),
+  experience: z.number().int().min(0).optional(),
+  level: z.number().int().positive().optional(),
+  money: z.number().int().min(0).optional(),
+  isActive: z.boolean().optional(),
 });
 
 export type UpdateHeroRequest = z.infer<typeof updateHeroSchema>;
