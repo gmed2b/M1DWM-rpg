@@ -1,35 +1,37 @@
-@import './base.css';
+/* You can add global styles to this file, and also import other style files */
 
-#app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  font-weight: normal;
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+@import 'tailwindcss';
+@import '../../node_modules/rpgui/rpgui.min.css';
+
+html,
+body {
+  @apply bg-neutral-800 min-h-full;
+  font-family: 'Press Start 2P', system-ui, sans-serif;
 }
 
-a,
-.green {
-  text-decoration: none;
-  color: hsla(160, 100%, 37%, 1);
-  transition: 0.4s;
-  padding: 3px;
+.rpgui-container,
+.rpgui-content {
+  position: initial;
 }
 
-@media (hover: hover) {
-  a:hover {
-    background-color: hsla(160, 100%, 37%, 0.2);
-  }
+.rpgui-button p {
+  @apply py-3;
 }
 
-@media (min-width: 1024px) {
-  body {
-    display: flex;
-    place-items: center;
-  }
-
-  #app {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    padding: 0 2rem;
-  }
+.rpgui-icon.sword-2 {
+  background-image: url('./icons/sword-2.png');
+}
+.rpgui-icon.bow {
+  background-image: url('./icons/bow.png');
+}
+.rpgui-icon.coin-bag {
+  background-image: url('./icons/coin-bag.png');
+}
+.rpgui-icon.wand {
+  background-image: url('./icons/wand.png');
+}
+.rpgui-icon.potion {
+  background-image: url('./icons/potion.png');
 }

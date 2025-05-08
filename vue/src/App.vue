@@ -1,47 +1,40 @@
 <script setup lang="ts">
-import HelloWorld from './components/HelloWorld.vue'
-import TheWelcome from './components/TheWelcome.vue'
+import { computed, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
+import { useAuthStore } from './stores/auth'
+import Navbar from './components/Navbar/Navbar.vue'
+
+const authStore = useAuthStore()
+const route = useRoute()
+
+// Vérifier si la page actuelle nécessite la navbar (toutes sauf login et register)
+const showNavbar = computed(() => {
+  return authStore.isLoggedIn && route.path !== '/login' && route.path !== '/register'
+})
+
+// Initialiser le store d'authentification au démarrage
+onMounted(() => {
+  authStore.initialize()
+})
 </script>
 
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="./assets/logo.svg" width="125" height="125" />
+  <div class="app-container bg-gray-900 min-h-screen">
+    <!-- Navbar visible uniquement si l'utilisateur est connecté -->
+    <Navbar v-if="showNavbar" />
 
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
-    </div>
-  </header>
-
-  <main>
-    <TheWelcome />
-  </main>
+    <!-- Le routeur affichera les composants ici -->
+    <router-view />
+  </div>
 </template>
 
-<style scoped>
-header {
-  line-height: 1.5;
-}
+<style>
+/* Importer Tailwind CSS */
+@import './assets/main.css';
 
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
-}
-
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
+.app-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 </style>
