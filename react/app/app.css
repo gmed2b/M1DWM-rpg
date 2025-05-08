@@ -1,0 +1,36 @@
+@import url("https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap");
+
+@import "tailwindcss";
+@import "../node_modules/rpgui/rpgui.min.css";
+
+html,
+body {
+  @apply bg-neutral-800 min-h-full;
+  font-family: "Press Start 2P", system-ui, sans-serif;
+  color: white;
+}
+
+.rpgui-container,
+.rpgui-content {
+  position: initial;
+}
+
+.rpgui-button p {
+  @apply py-3;
+}
+
+.rpgui-icon.sword-2 {
+  background-image: url("assets/icons/sword-2.png");
+}
+.rpgui-icon.bow {
+  background-image: url("assets/icons/bow.png");
+}
+.rpgui-icon.coin-bag {
+  background-image: url("assets/icons/coin-bag.png");
+}
+.rpgui-icon.wand {
+  background-image: url("assets/icons/wand.png");
+}
+.rpgui-icon.potion {
+  background-image: url("assets/icons/potion.png");
+}
