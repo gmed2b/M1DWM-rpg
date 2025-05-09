@@ -1,7 +1,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap");
 
 @import "tailwindcss";
-@import "../node_modules/rpgui/rpgui.min.css";
+@import "../../node_modules/rpgui/rpgui.min.css";
 
 html,
 body {
@@ -20,17 +20,17 @@ body {
 }
 
 .rpgui-icon.sword-2 {
-  background-image: url("assets/icons/sword-2.png");
+  background-image: url("../assets/icons/sword-2.png");
 }
 .rpgui-icon.bow {
-  background-image: url("assets/icons/bow.png");
+  background-image: url("../assets/icons/bow.png");
 }
 .rpgui-icon.coin-bag {
-  background-image: url("assets/icons/coin-bag.png");
+  background-image: url("../assets/icons/coin-bag.png");
 }
 .rpgui-icon.wand {
-  background-image: url("assets/icons/wand.png");
+  background-image: url("../assets/icons/wand.png");
 }
 .rpgui-icon.potion {
-  background-image: url("assets/icons/potion.png");
+  background-image: url("../assets/icons/potion.png");
 }
